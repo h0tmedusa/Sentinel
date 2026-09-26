@@ -41,6 +41,7 @@ const SEVERITY_BADGE = {
 
 export default function Home() {
   const [targetUrl, setTargetUrl] = useState('http://localhost:3000');
+  const [confirmAuthorized, setConfirmAuthorized] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [userA, setUserA] = useState({ username: '', password: '' });
   const [userB, setUserB] = useState({ username: '', password: '' });
@@ -58,6 +59,11 @@ export default function Home() {
     e.preventDefault();
     if (!targetUrl) return;
 
+    if (!confirmAuthorized) {
+      alert('You must confirm you are authorized to test this target before starting a scan.');
+      return;
+    }
+
     setLoading(true);
     setScanStatus('initializing');
     setScanData(null);
@@ -66,9 +72,12 @@ export default function Home() {
     try {
       const payload = {
         targetUrl,
+        confirmAuthorized: true,
         credentials: {
           userA: userA.username ? userA : undefined,
           userB: userB.username ? userB : undefined,
+          userAId: userA.username || undefined,
+          userBApiKey: userB.password || userB.username || undefined,
         },
       };
 
@@ -195,8 +204,9 @@ export default function Home() {
 
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-800 disabled:cursor-not-allowed text-slate-950 font-semibold rounded-lg shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+                  disabled={loading || !confirmAuthorized}
+                  title={!confirmAuthorized ? 'Please confirm authorization to enable scanning' : 'Start Security Scan'}
+                  className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 disabled:border disabled:border-slate-700/60 disabled:cursor-not-allowed text-slate-950 font-semibold rounded-lg shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -205,12 +215,29 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      <Shield className="w-4 h-4 text-slate-950" />
+                      <Shield className="w-4 h-4" />
                       Start Scan
                     </>
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* Authorization Confirmation Gate */}
+            <div className="flex items-center space-x-2.5 pt-1 px-1">
+              <input
+                type="checkbox"
+                id="confirmAuthorized"
+                checked={confirmAuthorized}
+                onChange={(e) => setConfirmAuthorized(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900 cursor-pointer accent-emerald-500"
+              />
+              <label htmlFor="confirmAuthorized" className="text-xs text-slate-300 cursor-pointer select-none flex items-center gap-1.5">
+                <span>I confirm that I own or am authorized to security-test this target</span>
+                <span className="font-mono text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/20 text-[11px]">
+                  {targetUrl || 'http://localhost:3000'}
+                </span>
+              </label>
             </div>
 
             {/* Optional Credentials Panel */}

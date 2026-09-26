@@ -1,34 +1,50 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { checks } from '@/lib/checks/index.js';
+import { parseAndNormalizeUrl } from '@/lib/urlParser.js';
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { targetUrl, credentials } = body;
+    const { targetUrl, credentials, confirmAuthorized } = body;
 
-    if (!targetUrl || typeof targetUrl !== 'string') {
+    // 1. Explicit authorization confirmation gate
+    if (confirmAuthorized !== true) {
       return NextResponse.json(
-        { error: 'Valid targetUrl is required' },
+        { error: 'You must confirm you are authorized to test this target before a scan can run.' },
         { status: 400 }
       );
     }
 
-    // 1. Create Scan record with 'running' status
+    // 2. SSRF protection and URL normalization
+    let parsedUrl;
+    try {
+      parsedUrl = parseAndNormalizeUrl(targetUrl);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: 400 }
+      );
+    }
+
+    const { normalizedUrl } = parsedUrl;
+
+    // 3. Create Scan record with 'running' status and authorizedConfirmed audit trail
     const scan = await prisma.scan.create({
       data: {
-        targetUrl,
+        targetUrl: normalizedUrl,
         status: 'running',
+        authorizedConfirmed: true,
         startedAt: new Date(),
       },
     });
 
     const ctx = {
-      targetUrl,
+      targetUrl: normalizedUrl,
       credentials: credentials || {},
     };
 
-    // 2. Run all registered checks in sequence or parallel safely
+    // 4. Run all registered checks in sequence or parallel safely
     const allFindings = [];
     for (const check of checks) {
       try {
@@ -44,7 +60,7 @@ export async function POST(request) {
           category: check.category || 'api-config',
           title: `Execution error in check: ${check.id}`,
           description: `An unhandled exception occurred during execution: ${err.message}`,
-          affectedComponent: targetUrl,
+          affectedComponent: normalizedUrl,
           severity: 'low',
           referenceScore: 'N/A',
           confidence: 'needs-review',
@@ -54,14 +70,14 @@ export async function POST(request) {
             stack: err.stack,
             timestamp: new Date().toISOString(),
           }),
-          stepsToReproduce: `Execute check ${check.id} with context against ${targetUrl}`,
+          stepsToReproduce: `Execute check ${check.id} with context against ${normalizedUrl}`,
           businessImpact: 'Check execution failed prematurely.',
           remediation: 'Review scanner logs and target compatibility.',
         });
       }
     }
 
-    // 3. Persist all findings attached to this scan
+    // 5. Persist all findings attached to this scan
     if (allFindings.length > 0) {
       await prisma.finding.createMany({
         data: allFindings.map((f) => ({
@@ -70,7 +86,7 @@ export async function POST(request) {
           category: f.category,
           title: f.title,
           description: f.description,
-          affectedComponent: f.affectedComponent || targetUrl,
+          affectedComponent: f.affectedComponent || normalizedUrl,
           severity: f.severity,
           referenceScore: f.referenceScore || 'N/A',
           confidence: f.confidence || 'confirmed',
@@ -82,7 +98,7 @@ export async function POST(request) {
       });
     }
 
-    // 4. Update scan status to 'done'
+    // 6. Update scan status to 'done'
     const updatedScan = await prisma.scan.update({
       where: { id: scan.id },
       data: {
