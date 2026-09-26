@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { checks } from '@/lib/checks/index.js';
 import { parseAndNormalizeUrl } from '@/lib/urlParser.js';
+import { redactEvidence } from '@/lib/redact.js';
 
 export async function POST(request) {
   try {
@@ -77,10 +78,19 @@ export async function POST(request) {
       }
     }
 
-    // 5. Persist all findings attached to this scan
+    // 5. Persist all findings attached to this scan (with sensitive values redacted)
     if (allFindings.length > 0) {
-      await prisma.finding.createMany({
-        data: allFindings.map((f) => ({
+      const sanitizedFindings = allFindings.map((f) => {
+        let sanitizedEvidence = f.evidence;
+        try {
+          const parsed = typeof f.evidence === 'string' ? JSON.parse(f.evidence) : f.evidence;
+          const redacted = redactEvidence(parsed);
+          sanitizedEvidence = JSON.stringify(redacted);
+        } catch {
+          sanitizedEvidence = typeof f.evidence === 'string' ? f.evidence : JSON.stringify(f.evidence);
+        }
+
+        return {
           scanId: scan.id,
           checkId: f.checkId,
           category: f.category,
@@ -90,11 +100,15 @@ export async function POST(request) {
           severity: f.severity,
           referenceScore: f.referenceScore || 'N/A',
           confidence: f.confidence || 'confirmed',
-          evidence: typeof f.evidence === 'string' ? f.evidence : JSON.stringify(f.evidence),
+          evidence: sanitizedEvidence,
           stepsToReproduce: f.stepsToReproduce || '',
           businessImpact: f.businessImpact || '',
           remediation: f.remediation || '',
-        })),
+        };
+      });
+
+      await prisma.finding.createMany({
+        data: sanitizedFindings,
       });
     }
 
