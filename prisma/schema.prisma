@@ -27,6 +27,7 @@ model Finding {
   affectedComponent  String
   severity           String   // critical | high | medium | low
   referenceScore     String
+  cweId              String?
   confidence         String   // confirmed | needs-review
   evidence           String   // JSON stringified holding actual request(s)/response(s)
   stepsToReproduce   String

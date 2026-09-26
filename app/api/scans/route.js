@@ -7,7 +7,7 @@ import { redactEvidence } from '@/lib/redact.js';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { targetUrl, credentials, confirmAuthorized } = body;
+    const { targetUrl, credentials, confirmAuthorized, checkIds } = body;
 
     // 1. Explicit authorization confirmation gate
     if (confirmAuthorized !== true) {
@@ -30,7 +30,15 @@ export async function POST(request) {
 
     const { normalizedUrl } = parsedUrl;
 
-    // 3. Create Scan record with 'running' status and authorizedConfirmed audit trail
+    // 3. Resolve active checks based on optional checkIds filter
+    let activeChecks = checks;
+    if (Array.isArray(checkIds) && checkIds.length > 0) {
+      const selectedSet = new Set(checkIds);
+      activeChecks = checks.filter((c) => selectedSet.has(c.id));
+    }
+    const checksRun = activeChecks.map((c) => c.id);
+
+    // 4. Create Scan record with 'running' status and authorizedConfirmed audit trail
     const scan = await prisma.scan.create({
       data: {
         targetUrl: normalizedUrl,
@@ -45,9 +53,9 @@ export async function POST(request) {
       credentials: credentials || {},
     };
 
-    // 4. Run all registered checks in sequence or parallel safely
+    // 5. Run active registered checks in sequence safely
     const allFindings = [];
-    for (const check of checks) {
+    for (const check of activeChecks) {
       try {
         const results = await check.run(ctx);
         if (Array.isArray(results)) {
@@ -64,6 +72,7 @@ export async function POST(request) {
           affectedComponent: normalizedUrl,
           severity: 'low',
           referenceScore: 'N/A',
+          cweId: null,
           confidence: 'needs-review',
           evidence: JSON.stringify({
             checkId: check.id,
@@ -78,7 +87,7 @@ export async function POST(request) {
       }
     }
 
-    // 5. Persist all findings attached to this scan (with sensitive values redacted)
+    // 6. Persist all findings attached to this scan (with sensitive values redacted)
     if (allFindings.length > 0) {
       const sanitizedFindings = allFindings.map((f) => {
         let sanitizedEvidence = f.evidence;
@@ -99,6 +108,7 @@ export async function POST(request) {
           affectedComponent: f.affectedComponent || normalizedUrl,
           severity: f.severity,
           referenceScore: f.referenceScore || 'N/A',
+          cweId: f.cweId || null,
           confidence: f.confidence || 'confirmed',
           evidence: sanitizedEvidence,
           stepsToReproduce: f.stepsToReproduce || '',
@@ -112,7 +122,7 @@ export async function POST(request) {
       });
     }
 
-    // 6. Update scan status to 'done'
+    // 7. Update scan status to 'done'
     const updatedScan = await prisma.scan.update({
       where: { id: scan.id },
       data: {
@@ -125,6 +135,7 @@ export async function POST(request) {
       scanId: updatedScan.id,
       status: updatedScan.status,
       findingsCount: allFindings.length,
+      checksRun,
     });
   } catch (error) {
     console.error('Error running scan:', error);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
+import { enrichFinding } from '@/lib/referenceData.js';
 
 export async function GET(request, { params }) {
   try {
@@ -10,7 +11,7 @@ export async function GET(request, { params }) {
       include: {
         findings: {
           orderBy: [
-            { severity: 'asc' }, // Will sort in application logic or custom priority
+            { severity: 'asc' },
             { createdAt: 'asc' },
           ],
         },
@@ -21,7 +22,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
     }
 
-    // Parse evidence JSON safely for each finding before returning
+    // Parse evidence JSON safely and enrich each finding with static reference data
     const parsedFindings = scan.findings.map((f) => {
       let parsedEvidence = f.evidence;
       try {
@@ -29,10 +30,10 @@ export async function GET(request, { params }) {
       } catch (e) {
         // Keep raw string if parsing fails
       }
-      return {
+      return enrichFinding({
         ...f,
         evidence: parsedEvidence,
-      };
+      });
     });
 
     return NextResponse.json({
@@ -40,6 +41,7 @@ export async function GET(request, { params }) {
         id: scan.id,
         targetUrl: scan.targetUrl,
         status: scan.status,
+        authorizedConfirmed: scan.authorizedConfirmed,
         startedAt: scan.startedAt,
         finishedAt: scan.finishedAt,
       },
