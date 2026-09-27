@@ -92,7 +92,7 @@ export default function ScanHistoryPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <Link href={`/?scanId=${s.id}`} className="text-slate-500 hover:text-emerald-400" title="View this scan on the Dashboard">
+                        <Link href={`/vulnerability-matrix?scanId=${s.id}`} className="text-slate-500 hover:text-emerald-400" title="View this scan on the Dashboard">
                           <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                       </td>
