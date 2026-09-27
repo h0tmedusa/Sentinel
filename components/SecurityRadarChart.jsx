@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { Shield } from 'lucide-react';
 
 const VECTORS = [
   { key: 'session-handling', label: 'Session Handling' },
@@ -49,16 +48,13 @@ export default function SecurityRadarChart({ findings = [] }) {
   const polygonPoints = vectorPoints.map((p) => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col gap-3">
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider">
-            Category Coverage Radar
-          </h3>
-        </div>
-        <span className="text-[11px] font-mono text-slate-500">
-          7 Vectors Analyzed
+    <div className="bg-canvas-raised border border-border rounded-lg p-5 flex flex-col gap-3">
+      <div className="flex items-center justify-between pb-2 border-b border-border">
+        <h3 className="text-sm font-medium text-ink">
+          Category Coverage Radar
+        </h3>
+        <span className="text-xs text-ink-faint">
+          7 Vectors
         </span>
       </div>
 
@@ -77,7 +73,7 @@ export default function SecurityRadarChart({ findings = [] }) {
               fill="none"
               stroke="currentColor"
               strokeDasharray="3 3"
-              className="text-slate-800/80"
+              className="text-border"
               strokeWidth="1"
             />
           ))}
@@ -91,7 +87,7 @@ export default function SecurityRadarChart({ findings = [] }) {
               x2={p.axisX}
               y2={p.axisY}
               stroke="currentColor"
-              className="text-slate-800"
+              className="text-border"
               strokeWidth="1"
             />
           ))}
@@ -99,9 +95,10 @@ export default function SecurityRadarChart({ findings = [] }) {
           {/* Polygon area */}
           <polygon
             points={polygonPoints}
-            fill="rgba(16, 185, 129, 0.2)"
-            stroke="#10b981"
-            strokeWidth="2"
+            fill="#3E7BFA"
+            fillOpacity="0.15"
+            stroke="#3E7BFA"
+            strokeWidth="1.5"
             strokeLinejoin="round"
           />
 
@@ -111,11 +108,11 @@ export default function SecurityRadarChart({ findings = [] }) {
               key={idx}
               cx={p.x}
               cy={p.y}
-              r={hoveredVector?.key === p.key ? 5 : 3.5}
-              fill={p.score > 0 ? '#10b981' : '#64748b'}
-              stroke="#0f172a"
+              r={hoveredVector?.key === p.key ? 4.5 : 3}
+              fill={p.score > 0 ? '#3E7BFA' : '#5D6069'}
+              stroke="#0B0D10"
               strokeWidth="1.5"
-              className="cursor-pointer transition-all duration-200"
+              className="cursor-pointer transition-all duration-150"
               onMouseEnter={() => setHoveredVector(p)}
               onMouseLeave={() => setHoveredVector(null)}
             />
@@ -131,8 +128,8 @@ export default function SecurityRadarChart({ findings = [] }) {
                 y={p.labelY}
                 textAnchor="middle"
                 dominantBaseline="central"
-                className={`text-[10px] font-mono cursor-pointer transition-colors duration-150 ${
-                  isHovered ? 'fill-emerald-400 font-bold' : 'fill-slate-400'
+                className={`text-[10px] cursor-pointer transition-colors duration-150 ${
+                  isHovered ? 'fill-accent font-medium' : 'fill-ink-muted'
                 }`}
                 onMouseEnter={() => setHoveredVector(p)}
                 onMouseLeave={() => setHoveredVector(null)}
@@ -145,11 +142,11 @@ export default function SecurityRadarChart({ findings = [] }) {
 
         {/* Floating Tooltip */}
         {hoveredVector && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-lg bg-slate-950/90 border border-slate-700 shadow-xl backdrop-blur text-center flex flex-col gap-0.5">
-            <span className="text-xs font-bold text-emerald-400 font-mono">
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded bg-canvas-overlay border border-border shadow-raised text-center flex flex-col gap-0.5">
+            <span className="text-xs font-semibold text-accent">
               {hoveredVector.label}
             </span>
-            <span className="text-[11px] text-slate-300 font-mono">
+            <span className="text-[11px] text-ink-muted">
               Score: {hoveredVector.score}/100 • {hoveredVector.count} finding{hoveredVector.count !== 1 ? 's' : ''}
             </span>
           </div>

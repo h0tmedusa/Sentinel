@@ -1,12 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { TrendingUp } from 'lucide-react';
 
 function TooltipItem({ label, value, valueClass }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-[11px] font-mono">
-      <span className="text-slate-400">{label}:</span>
-      <span className={valueClass || 'text-slate-200 font-bold'}>{value}</span>
+    <div className="flex items-center justify-between gap-3 text-[11px]">
+      <span className="text-ink-muted">{label}:</span>
+      <span className={valueClass || 'text-ink font-medium'}>{value}</span>
     </div>
   );
 }
@@ -16,14 +15,12 @@ export default function RiskTrendChart({ historyScans = [] }) {
 
   if (!historyScans || historyScans.length === 0) {
     return (
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex items-center justify-center min-h-[160px]">
-        <span className="text-xs font-mono text-slate-600">No scan history yet</span>
+      <div className="bg-canvas-raised border border-border rounded-lg p-5 flex items-center justify-center min-h-[160px]">
+        <span className="text-xs text-ink-faint">No scan history yet</span>
       </div>
     );
   }
 
-  // Scans from /api/scans/history arrive ordered desc by startedAt.
-  // For the chart timeline, reverse them so time flows left to right.
   const scans = [...historyScans].reverse();
 
   const width = 640;
@@ -50,15 +47,12 @@ export default function RiskTrendChart({ historyScans = [] }) {
     : `${pathD} L ${points[points.length - 1].x},${padTop + chartH} L ${points[0].x},${padTop + chartH} Z`;
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col gap-3">
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider">
-            Risk Score Trend
-          </h3>
-        </div>
-        <span className="text-[11px] font-mono text-slate-500">
+    <div className="bg-canvas-raised border border-border rounded-lg p-5 flex flex-col gap-3">
+      <div className="flex items-center justify-between pb-2 border-b border-border">
+        <h3 className="text-sm font-medium text-ink">
+          Risk Score Trend
+        </h3>
+        <span className="text-xs text-ink-faint">
           Last {historyScans.length} Scan{historyScans.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -68,13 +62,6 @@ export default function RiskTrendChart({ historyScans = [] }) {
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-auto overflow-visible select-none"
         >
-          <defs>
-            <linearGradient id="riskAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
-            </linearGradient>
-          </defs>
-
           {/* Grid lines (0, 25, 50, 75, 100) */}
           {[0, 25, 50, 75, 100].map((score) => {
             const y = padTop + chartH - (score / 100) * chartH;
@@ -86,7 +73,7 @@ export default function RiskTrendChart({ historyScans = [] }) {
                   x2={width - padX}
                   y2={y}
                   stroke="currentColor"
-                  className="text-slate-800/80"
+                  className="text-border"
                   strokeDasharray="2 4"
                   strokeWidth="1"
                 />
@@ -94,7 +81,7 @@ export default function RiskTrendChart({ historyScans = [] }) {
                   x={padX - 8}
                   y={y + 3}
                   textAnchor="end"
-                  className="text-[9px] font-mono fill-slate-600"
+                  className="text-[9px] fill-ink-faint"
                 >
                   {score}
                 </text>
@@ -102,15 +89,15 @@ export default function RiskTrendChart({ historyScans = [] }) {
             );
           })}
 
-          {/* Gradient area under line */}
-          {areaD && <path d={areaD} fill="url(#riskAreaGrad)" />}
+          {/* Area under line with flat fill opacity */}
+          {areaD && <path d={areaD} fill="#3E7BFA" fillOpacity="0.1" />}
 
           {/* Sparkline path */}
           <path
             d={pathD}
             fill="none"
-            stroke="#06b6d4"
-            strokeWidth="2.5"
+            stroke="#3E7BFA"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -121,10 +108,10 @@ export default function RiskTrendChart({ historyScans = [] }) {
               key={p.id || idx}
               cx={p.x}
               cy={p.y}
-              r={hoveredScan?.id === p.id ? 6 : 4}
-              fill={p.score >= 70 ? '#ef4444' : p.score >= 40 ? '#f97316' : '#06b6d4'}
-              stroke="#0f172a"
-              strokeWidth="2"
+              r={hoveredScan?.id === p.id ? 5 : 3.5}
+              fill={p.score >= 70 ? '#D33B3B' : p.score >= 40 ? '#D97A3D' : '#3E7BFA'}
+              stroke="#0B0D10"
+              strokeWidth="1.5"
               className="cursor-pointer transition-all duration-150"
               onMouseEnter={() => setHoveredScan(p)}
               onMouseLeave={() => setHoveredScan(null)}
@@ -138,7 +125,7 @@ export default function RiskTrendChart({ historyScans = [] }) {
               x={p.x}
               y={height - 8}
               textAnchor="middle"
-              className="text-[9px] font-mono fill-slate-500"
+              className="text-[9px] font-mono fill-ink-faint"
             >
               #{idx + 1}
             </text>
@@ -147,13 +134,13 @@ export default function RiskTrendChart({ historyScans = [] }) {
 
         {/* Hover Tooltip Box */}
         {hoveredScan && (
-          <div className="absolute top-2 right-4 pointer-events-none p-3 rounded-lg bg-slate-950/95 border border-slate-700 shadow-xl backdrop-blur flex flex-col gap-1 min-w-[190px]">
-            <div className="text-[11px] font-mono text-cyan-400 font-bold truncate max-w-[200px]">
+          <div className="absolute top-2 right-4 pointer-events-none p-3 rounded bg-canvas-overlay border border-border shadow-raised flex flex-col gap-1 min-w-[190px]">
+            <div className="text-[11px] font-mono text-ink font-medium truncate max-w-[200px]">
               {hoveredScan.targetUrl}
             </div>
-            <TooltipItem label="Risk Score" value={`${hoveredScan.score}/100`} valueClass={hoveredScan.score >= 70 ? 'text-red-400 font-bold' : hoveredScan.score >= 40 ? 'text-orange-400 font-bold' : 'text-emerald-400 font-bold'} />
+            <TooltipItem label="Risk Score" value={`${hoveredScan.score}/100`} valueClass={hoveredScan.score >= 70 ? 'text-severity-critical font-medium' : hoveredScan.score >= 40 ? 'text-severity-high font-medium' : 'text-severity-low font-medium'} />
             <TooltipItem label="Findings" value={hoveredScan.totalFindings} />
-            <TooltipItem label="Critical" value={hoveredScan.criticalCount} valueClass="text-red-400 font-bold" />
+            <TooltipItem label="Critical" value={hoveredScan.criticalCount} valueClass="text-severity-critical font-medium" />
             <TooltipItem label="Duration" value={`${hoveredScan.durationSeconds}s`} />
           </div>
         )}

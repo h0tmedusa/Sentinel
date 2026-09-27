@@ -4,11 +4,10 @@ import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 
 const ToastContext = createContext(null);
 
-// tailwindcss-animate is NOT installed; use plain transition classes instead.
 const TOAST_STYLES = {
-  success: { icon: CheckCircle2, classes: 'bg-emerald-950/90 border-emerald-800 text-emerald-200' },
-  error:   { icon: AlertTriangle, classes: 'bg-red-950/90 border-red-800 text-red-200' },
-  info:    { icon: Info,          classes: 'bg-slate-900/90 border-slate-700 text-slate-200' },
+  success: { icon: CheckCircle2, bar: 'bg-severity-low', iconClass: 'text-severity-low' },
+  error:   { icon: AlertTriangle, bar: 'bg-severity-critical', iconClass: 'text-severity-critical' },
+  info:    { icon: Info, bar: 'bg-accent', iconClass: 'text-accent' },
 };
 
 export function ToastProvider({ children }) {
@@ -36,17 +35,20 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={t.id}
-              className={`pointer-events-auto flex items-start gap-2.5 p-3 rounded-lg border backdrop-blur-sm shadow-xl transition-opacity duration-200 ${style.classes}`}
+              className="pointer-events-auto flex items-start gap-2.5 overflow-hidden rounded border border-border bg-canvas-overlay shadow-raised transition-opacity duration-200"
             >
-              <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <p className="flex-1 text-xs leading-relaxed">{t.message}</p>
-              <button
-                onClick={() => dismissToast(t.id)}
-                aria-label="Dismiss notification"
-                className="flex-shrink-0 opacity-60 hover:opacity-100"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
+              <div className={`w-0.5 self-stretch flex-shrink-0 ${style.bar}`} />
+              <div className="flex items-start gap-2.5 flex-1 p-3">
+                <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${style.iconClass}`} />
+                <p className="flex-1 text-xs leading-relaxed text-ink">{t.message}</p>
+                <button
+                  onClick={() => dismissToast(t.id)}
+                  aria-label="Dismiss notification"
+                  className="flex-shrink-0 text-ink-faint hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           );
         })}

@@ -1,5 +1,8 @@
 import './globals.css';
+import { Inter } from 'next/font/google';
 import { ToastProvider } from '@/components/ToastProvider';
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata = {
   title: 'Sentinel - Security Assessment Platform',
@@ -8,8 +11,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-slate-950 text-slate-100 antialiased">
+    <html lang="en" className={inter.className}>
+      <body className="min-h-screen bg-canvas text-ink antialiased">
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

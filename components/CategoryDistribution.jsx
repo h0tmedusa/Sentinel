@@ -1,5 +1,4 @@
 'use client';
-import { Layers } from 'lucide-react';
 
 const CWE_MAP = [
   { cweId: 'CWE-89', name: 'SQL Injection' },
@@ -24,39 +23,38 @@ export default function CategoryDistribution({ findings = [] }) {
     const count = findings.filter((f) => f.cweId === item.cweId).length;
     const percentage = Math.round((count / total) * 100);
     return { ...item, count, percentage };
-  }).filter((item) => item.count > 0); // only show CWEs actually present in this scan
+  }).filter((item) => item.count > 0);
 
   if (distribution.length === 0) {
     return (
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center justify-center min-h-[120px]">
-        <span className="text-xs font-mono text-slate-600">No CWE-classified findings in this scan</span>
+      <div className="bg-canvas-raised border border-border rounded-lg p-5 flex items-center justify-center min-h-[120px]">
+        <span className="text-xs text-ink-faint">No CWE-classified findings in this scan</span>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col gap-3">
-      <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
-        <Layers className="w-4 h-4 text-emerald-400" />
-        <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider">CWE Distribution</h3>
+    <div className="bg-canvas-raised border border-border rounded-lg p-5 flex flex-col gap-3">
+      <div className="flex items-center justify-between pb-2 border-b border-border">
+        <h3 className="text-sm font-medium text-ink">CWE Distribution</h3>
       </div>
       <div className="flex flex-col gap-2.5">
         {distribution.map((item) => (
-          <div key={item.cweId} className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg flex flex-col gap-1.5">
-            <div className="flex items-center justify-between text-xs font-mono">
+          <div key={item.cweId} className="p-2.5 bg-canvas-overlay border border-border rounded flex flex-col gap-1.5">
+            <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
+                <span className="font-mono text-ink-muted">
                   {item.cweId}
                 </span>
-                <span className="text-slate-200 font-medium">{item.name}</span>
+                <span className="text-ink font-medium">{item.name}</span>
               </div>
-              <span className="text-amber-400 font-bold">
-                {item.count} finding{item.count !== 1 ? 's' : ''} ({item.percentage}%)
+              <span className="text-ink-muted">
+                {item.count} ({item.percentage}%)
               </span>
             </div>
-            <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div className="w-full h-1.5 bg-canvas rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-500 to-red-500 transition-all duration-500"
+                className="h-full bg-accent transition-all duration-300"
                 style={{ width: `${Math.max(3, item.percentage)}%` }}
               />
             </div>
