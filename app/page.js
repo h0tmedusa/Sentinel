@@ -15,32 +15,16 @@ import {
   Key, 
   User, 
   Layers, 
-  Clock
+  Clock,
+  Menu,
 } from 'lucide-react';
-
-const SEVERITY_ORDER = {
-  critical: 1,
-  high: 2,
-  medium: 3,
-  low: 4,
-};
-
-const SEVERITY_COLORS = {
-  critical: 'bg-red-500/20 text-red-400 border-red-500/30',
-  high: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  low: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-};
-
-const SEVERITY_BADGE = {
-  critical: 'bg-red-600 text-white',
-  high: 'bg-orange-600 text-white',
-  medium: 'bg-amber-600 text-white',
-  low: 'bg-blue-600 text-white',
-};
+import { SEVERITY_ORDER, SEVERITY_COLORS, SEVERITY_BADGE } from '@/lib/severityTheme';
+import BrandLoader from '@/components/BrandLoader';
+import NavDrawer from '@/components/NavDrawer';
 
 export default function Home() {
   const [targetUrl, setTargetUrl] = useState('http://localhost:3000');
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [confirmAuthorized, setConfirmAuthorized] = useState(false);
   const [scanError, setScanError] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -168,10 +152,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <BrandLoader />
+      <NavDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open navigation"
+              className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors mr-1"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400">
               <Shield className="w-6 h-6" />
             </div>
@@ -182,7 +176,7 @@ export default function Home() {
                   PHASE 1
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Security Assessment & Compliance Engine</p>
+              <p className="text-xs text-slate-400">Security Assessment &amp; Compliance Engine</p>
             </div>
           </div>
           <div className="text-xs text-slate-400 flex items-center space-x-2 font-mono">
