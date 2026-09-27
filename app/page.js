@@ -21,6 +21,8 @@ import {
 import { SEVERITY_ORDER, SEVERITY_COLORS, SEVERITY_BADGE } from '@/lib/severityTheme';
 import BrandLoader from '@/components/BrandLoader';
 import NavDrawer from '@/components/NavDrawer';
+import SecurityRadarChart from '@/components/SecurityRadarChart';
+import CategoryDistribution from '@/components/CategoryDistribution';
 
 export default function Home() {
   const [targetUrl, setTargetUrl] = useState('http://localhost:3000');
@@ -395,6 +397,12 @@ export default function Home() {
                 <div className="text-xs text-blue-400 uppercase tracking-wider">Low</div>
                 <div className="text-2xl font-bold text-blue-400 mt-1">{stats.low}</div>
               </div>
+            </div>
+
+            {/* Coverage Radar & CWE Distribution */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <SecurityRadarChart findings={findings} />
+              <CategoryDistribution findings={findings} />
             </div>
 
             <div className="flex items-center justify-between text-xs text-slate-400 px-1">
