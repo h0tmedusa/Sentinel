@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
   ShieldAlert, 
@@ -42,6 +42,7 @@ const SEVERITY_BADGE = {
 export default function Home() {
   const [targetUrl, setTargetUrl] = useState('http://localhost:3000');
   const [confirmAuthorized, setConfirmAuthorized] = useState(false);
+  const [scanError, setScanError] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [userA, setUserA] = useState({ username: '', password: '' });
   const [userB, setUserB] = useState({ username: '', password: '' });
@@ -50,6 +51,17 @@ export default function Home() {
   const [scanData, setScanData] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
   const [filterSeverity, setFilterSeverity] = useState('all');
+
+  const pollIntervalRef = useRef(null);
+  const pollAttemptsRef = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
 
   const toggleRow = (id) => {
     setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -60,13 +72,14 @@ export default function Home() {
     if (!targetUrl) return;
 
     if (!confirmAuthorized) {
-      alert('You must confirm you are authorized to test this target before starting a scan.');
+      setScanError('You must confirm authorization before starting a scan.');
       return;
     }
 
     setLoading(true);
     setScanStatus('initializing');
     setScanData(null);
+    setScanError(null);
     setExpandedRows({});
 
     try {
@@ -95,14 +108,28 @@ export default function Home() {
       const { scanId } = await res.json();
       setScanStatus('running');
 
-      // Poll scan status
-      const pollInterval = setInterval(async () => {
+      const MAX_POLL_ATTEMPTS = 90; // 90 seconds at 1000ms interval
+      pollAttemptsRef.current = 0;
+
+      pollIntervalRef.current = setInterval(async () => {
+        pollAttemptsRef.current += 1;
+
+        if (pollAttemptsRef.current > MAX_POLL_ATTEMPTS) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+          setScanStatus('failed');
+          setScanError('Scan timed out after 90 seconds without completing. The target may be unreachable or a check may be hanging.');
+          setLoading(false);
+          return;
+        }
+
         try {
           const checkRes = await fetch(`/api/scans/${scanId}`);
           if (checkRes.ok) {
             const data = await checkRes.json();
             if (data.scan && (data.scan.status === 'done' || data.scan.status === 'failed')) {
-              clearInterval(pollInterval);
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
               setScanData(data);
               setScanStatus(data.scan.status);
               setLoading(false);
@@ -114,7 +141,7 @@ export default function Home() {
       }, 1000);
     } catch (err) {
       console.error(err);
-      alert(`Error starting scan: ${err.message}`);
+      setScanError(err.message || 'Failed to start scan. Please try again.');
       setLoading(false);
       setScanStatus('error');
     }
@@ -224,73 +251,91 @@ export default function Home() {
             </div>
 
             {/* Authorization Confirmation Gate */}
-            <div className="flex items-center space-x-2.5 pt-1 px-1">
+            <label className="flex items-start gap-3 p-3 bg-amber-950/20 border border-amber-900/40 rounded-lg cursor-pointer">
               <input
                 type="checkbox"
-                id="confirmAuthorized"
                 checked={confirmAuthorized}
                 onChange={(e) => setConfirmAuthorized(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900 cursor-pointer accent-emerald-500"
+                className="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500/50 focus:ring-offset-slate-950"
               />
-              <label htmlFor="confirmAuthorized" className="text-xs text-slate-300 cursor-pointer select-none flex items-center gap-1.5">
-                <span>I confirm that I own or am authorized to security-test this target</span>
-                <span className="font-mono text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/20 text-[11px]">
-                  {targetUrl || 'http://localhost:3000'}
-                </span>
-              </label>
-            </div>
+              <span className="text-xs text-amber-200 leading-relaxed">
+                I confirm I am authorized to run security tests against this target
+                (owned system, staging environment, or explicit written authorization).
+                Unauthorized scanning of third-party systems may be illegal.
+              </span>
+            </label>
 
             {/* Optional Credentials Panel */}
             {showAuth && (
-              <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-950/40 border border-slate-800 rounded-lg space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                    <User className="w-3.5 h-3.5" />
-                    User A Credentials (Primary)
+              <div className="mt-4 pt-4 border-t border-slate-800/80 space-y-4">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Used only by the cross-account access control check: enter the target account&apos;s User ID under User A, and a different account&apos;s API key under User B, to test whether User B can access User A&apos;s private data.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-slate-950/40 border border-slate-800 rounded-lg space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                      <User className="w-3.5 h-3.5" />
+                      User A — Resource Owner
+                    </div>
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        placeholder="Target User ID — e.g. usr_a1b2c3"
+                        value={userA.username}
+                        onChange={(e) => setUserA({ ...userA, username: e.target.value })}
+                        className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="(unused — leave blank)"
+                        value={userA.password}
+                        onChange={(e) => setUserA({ ...userA, password: e.target.value })}
+                        className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                      />
+                      <p className="text-[11px] text-slate-500">Only the Target User ID above is used for this account.</p>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      placeholder="Username / Email"
-                      value={userA.username}
-                      onChange={(e) => setUserA({ ...userA, username: e.target.value })}
-                      className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={userA.password}
-                      onChange={(e) => setUserA({ ...userA, password: e.target.value })}
-                      className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
 
-                <div className="p-4 bg-slate-950/40 border border-slate-800 rounded-lg space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-sky-400 uppercase tracking-wider">
-                    <User className="w-3.5 h-3.5" />
-                    User B Credentials (Secondary / Scoping)
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      placeholder="Username / Email"
-                      value={userB.username}
-                      onChange={(e) => setUserB({ ...userB, username: e.target.value })}
-                      className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={userB.password}
-                      onChange={(e) => setUserB({ ...userB, password: e.target.value })}
-                      className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
-                    />
+                  <div className="p-4 bg-slate-950/40 border border-slate-800 rounded-lg space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-sky-400 uppercase tracking-wider">
+                      <User className="w-3.5 h-3.5" />
+                      User B — Attempting Cross-Account Access
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="Username (optional)"
+                        value={userB.username}
+                        onChange={(e) => setUserB({ ...userB, username: e.target.value })}
+                        className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                      />
+                      <input
+                        type="password"
+                        placeholder="Account B's API key"
+                        value={userB.password}
+                        onChange={(e) => setUserB({ ...userB, password: e.target.value })}
+                        className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             )}
           </form>
+
+          {scanError && (
+            <div className="mt-4 flex items-start gap-3 p-3 bg-red-950/30 border border-red-900/40 rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 text-xs text-red-300 leading-relaxed">{scanError}</div>
+              <button
+                onClick={() => setScanError(null)}
+                className="text-red-400 hover:text-red-200 text-xs flex-shrink-0"
+                aria-label="Dismiss error"
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Scan Status & Stats Bar */}
