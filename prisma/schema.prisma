@@ -37,3 +37,12 @@ model Finding {
 
   scan               Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
 }
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("ANALYST") // ADMIN | ANALYST
+  createdAt    DateTime @default(now())
+}
+

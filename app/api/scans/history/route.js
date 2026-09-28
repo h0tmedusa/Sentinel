@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
+import { requireAuth } from '@/lib/requireAuth.js';
 
-export async function GET() {
+export async function GET(request) {
+  const authUser = await requireAuth(request);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const scans = await prisma.scan.findMany({
       orderBy: { startedAt: 'desc' },

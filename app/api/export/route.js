@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { enrichFinding } from '@/lib/referenceData.js';
+import { requireAuth } from '@/lib/requireAuth.js';
 
 const TOOL_NAME = 'Sentinel Security Assessment';
 const TOOL_VERSION = '1.0.0';
@@ -25,6 +26,9 @@ function escapeCEF(str) {
 }
 
 export async function GET(request) {
+  const authUser = await requireAuth(request);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const { searchParams } = new URL(request.url);
     const scanId = searchParams.get('scanId');

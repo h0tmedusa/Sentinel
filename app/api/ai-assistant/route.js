@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { REFERENCE_TABLE, enrichFinding } from '@/lib/referenceData.js';
+import { requireAuth } from '@/lib/requireAuth.js';
 
 function formatFindingItem(f, index) {
   const parts = [
@@ -151,6 +152,9 @@ function answerGeneralConcept(q) {
 }
 
 export async function POST(request) {
+  const authUser = await requireAuth(request);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const body = await request.json();
     const { query, scanId } = body || {};

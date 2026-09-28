@@ -3,8 +3,12 @@ import { prisma } from '@/lib/prisma.js';
 import { checks } from '@/lib/checks/index.js';
 import { parseAndNormalizeUrl } from '@/lib/urlParser.js';
 import { redactEvidence } from '@/lib/redact.js';
+import { requireAuth } from '@/lib/requireAuth.js';
 
 export async function POST(request) {
+  const authUser = await requireAuth(request);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const body = await request.json();
     const { targetUrl, credentials, confirmAuthorized, checkIds } = body;

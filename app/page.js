@@ -14,6 +14,8 @@ import {
 import { SEVERITY_ORDER, SEVERITY_COLORS } from '@/lib/severityTheme';
 import BrandLoader from '@/components/BrandLoader';
 import NavDrawer from '@/components/NavDrawer';
+import { UserBadge } from '@/components/UserBadge';
+import { useScan } from '@/components/ScanProvider';
 import SecurityRadarChart from '@/components/SecurityRadarChart';
 import CategoryDistribution from '@/components/CategoryDistribution';
 
@@ -25,14 +27,27 @@ export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [userA, setUserA] = useState({ username: '', password: '' });
   const [userB, setUserB] = useState({ username: '', password: '' });
+  const { currentScanData, currentScanStatus, setCurrentScan, clearCurrentScan } = useScan();
   const [loading, setLoading] = useState(false);
-  const [scanStatus, setScanStatus] = useState(null);
-  const [scanData, setScanData] = useState(null);
+  const [scanStatus, setScanStatus] = useState(currentScanStatus);
+  const [scanData, setScanData] = useState(currentScanData);
   const [expandedRows, setExpandedRows] = useState({});
   const [filterSeverity, setFilterSeverity] = useState('all');
 
+  const isScanningRef = useRef(false);
   const pollIntervalRef = useRef(null);
   const pollAttemptsRef = useRef(0);
+
+  // Sync state if context changes externally
+  useEffect(() => {
+    if (!isScanningRef.current) {
+      setScanData(currentScanData);
+      setScanStatus(currentScanStatus);
+      if (currentScanData?.scan?.targetUrl) {
+        setTargetUrl(currentScanData.scan.targetUrl);
+      }
+    }
+  }, [currentScanData, currentScanStatus]);
 
   useEffect(() => {
     return () => {
@@ -55,9 +70,11 @@ export default function Home() {
       return;
     }
 
+    isScanningRef.current = true;
     setLoading(true);
     setScanStatus('initializing');
     setScanData(null);
+    clearCurrentScan();
     setScanError(null);
     setExpandedRows({});
 
@@ -96,6 +113,7 @@ export default function Home() {
         if (pollAttemptsRef.current > MAX_POLL_ATTEMPTS) {
           clearInterval(pollIntervalRef.current);
           pollIntervalRef.current = null;
+          isScanningRef.current = false;
           setScanStatus('failed');
           setScanError('Scan timed out after 90 seconds without completing. The target may be unreachable or a check may be hanging.');
           setLoading(false);
@@ -109,8 +127,10 @@ export default function Home() {
             if (data.scan && (data.scan.status === 'done' || data.scan.status === 'failed')) {
               clearInterval(pollIntervalRef.current);
               pollIntervalRef.current = null;
+              isScanningRef.current = false;
               setScanData(data);
               setScanStatus(data.scan.status);
+              setCurrentScan(data, data.scan.status);
               setLoading(false);
             }
           }
@@ -120,6 +140,7 @@ export default function Home() {
       }, 1000);
     } catch (err) {
       console.error(err);
+      isScanningRef.current = false;
       setScanError(err.message || 'Failed to start scan. Please try again.');
       setLoading(false);
       setScanStatus('error');
@@ -166,8 +187,11 @@ export default function Home() {
               <h1 className="text-base font-semibold text-ink tracking-tight">Sentinel</h1>
             </div>
           </div>
-          <div className="text-xs text-ink-faint flex items-center gap-2">
-            <span>Target Scoped: Localhost / Development Only</span>
+          <div className="flex items-center gap-4">
+            <div className="text-xs text-ink-faint hidden sm:flex items-center gap-2">
+              <span>Target Scoped: Localhost / Development Only</span>
+            </div>
+            <UserBadge />
           </div>
         </div>
       </header>

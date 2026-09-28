@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Menu } from 'lucide-react';
 import RiskTrendChart from '@/components/RiskTrendChart';
 import NavDrawer from '@/components/NavDrawer';
+import { UserBadge } from '@/components/UserBadge';
 import { SEVERITY_TEXT } from '@/lib/severityTheme';
 
 export default function ScanHistoryPage() {
@@ -53,6 +54,7 @@ export default function ScanHistoryPage() {
             </Link>
             <h1 className="text-base font-semibold text-ink">Scan History</h1>
           </div>
+          <UserBadge />
         </div>
       </header>
 

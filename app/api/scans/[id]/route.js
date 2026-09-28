@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 import { enrichFinding } from '@/lib/referenceData.js';
+import { requireAuth } from '@/lib/requireAuth.js';
 
 export async function GET(request, { params }) {
+  const authUser = await requireAuth(request);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const { id } = await params;
 
