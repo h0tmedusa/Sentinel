@@ -9,6 +9,12 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   Clock,
+  Key,
+  KeyRound,
+  Play,
+  Layers,
+  FileSearch,
+  ExternalLink,
 } from 'lucide-react';
 import { SEVERITY_ORDER, SEVERITY_COLORS } from '@/lib/severityTheme';
 import BrandLoader from '@/components/BrandLoader';
@@ -163,212 +169,328 @@ export default function Home() {
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col min-w-0">
       <BrandLoader />
 
-      {/* Header Bar */}
+      {/* 1. Header Bar: Compact SOC status header */}
       <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-10 hidden lg:block">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-semibold text-ink">Dashboard</h1>
-            <span className="text-xs text-ink-faint">• Live Security Assessment</span>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <h1 className="text-sm font-semibold text-ink tracking-tight">Security Dashboard</h1>
+            <span className="text-xs text-ink-faint hidden sm:inline">• Automated Assessment &amp; Validation</span>
           </div>
-          <div className="text-xs text-ink-faint flex items-center gap-2">
-            <span>Target Scoped: Localhost / Development Only</span>
+
+          <div className="flex items-center gap-3 text-xs flex-shrink-0">
+            {/* Live Scan Status Pill */}
+            {loading ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-accent-muted border border-accent/30 text-accent font-medium font-mono text-[11px]">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                {scanStatus === 'initializing' ? 'INITIALIZING ENGINE' : 'SCAN IN PROGRESS'}
+              </span>
+            ) : scanData ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-canvas-overlay border border-border text-ink-muted text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-severity-low" />
+                ASSESSMENT LOADED ({findings.length} findings)
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-canvas-overlay border border-border text-ink-faint text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-ink-faint" />
+                READY FOR SCAN
+              </span>
+            )}
+            <span className="text-border hidden sm:inline">|</span>
+            <span className="text-ink-faint hidden sm:inline">Target Scope: Localhost / Dev Only</span>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
-        {/* Target & Config Form */}
-        <div className="bg-canvas-raised border border-border rounded-lg p-6">
-          <form onSubmit={handleStartScan} className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
-              <div className="flex-1 w-full">
-                <label className="block text-xs font-medium text-ink-muted mb-1.5">
-                  Target URL (Localhost Instance)
-                </label>
-                <input
-                  type="url"
-                  value={targetUrl}
-                  onChange={(e) => setTargetUrl(e.target.value)}
-                  required
-                  placeholder="http://localhost:3000"
-                  className="w-full px-3 py-2 bg-canvas border border-border rounded text-ink placeholder-ink-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono text-sm transition-colors"
-                />
-              </div>
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-6">
 
-              <div className="flex gap-2 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => setShowAuth(!showAuth)}
-                  className={`px-3 py-2 rounded border text-sm font-medium transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-accent ${
-                    showAuth 
-                      ? 'bg-canvas-overlay border-border text-ink' 
-                      : 'bg-canvas-raised border-border text-ink-muted hover:text-ink hover:bg-canvas-overlay'
-                  }`}
-                >
-                  Credentials {showAuth ? '▲' : '▼'}
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={loading || !confirmAuthorized}
-                  title={!confirmAuthorized ? 'Please confirm authorization to enable scanning' : 'Start Security Scan'}
-                  className="flex-1 sm:flex-none px-4 py-2 bg-accent hover:bg-accent-hover disabled:bg-canvas-raised disabled:text-ink-faint disabled:border disabled:border-border disabled:cursor-not-allowed text-white font-medium text-sm rounded transition-colors flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-accent"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      Scanning...
-                    </>
-                  ) : (
-                    'Start Scan'
-                  )}
-                </button>
-              </div>
+        {/* 2. Primary Scan Configuration Section */}
+        <section aria-label="Scan Configuration" className="bg-canvas-raised border border-border rounded-lg shadow-subtle overflow-hidden">
+          {/* Section Header */}
+          <div className="px-5 py-3.5 border-b border-border bg-canvas-overlay/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-accent" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Target Assessment Configuration</h2>
             </div>
+            <span className="text-[11px] font-mono text-ink-faint">Automated Checks (11 Vectors)</span>
+          </div>
 
-            {/* Authorization Confirmation Gate */}
-            <label className="flex items-start gap-2.5 p-3 bg-canvas-overlay border border-border rounded cursor-pointer">
-              <input
-                type="checkbox"
-                checked={confirmAuthorized}
-                onChange={(e) => setConfirmAuthorized(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded border-border bg-canvas text-accent focus:ring-accent focus:ring-offset-canvas"
-              />
-              <span className="text-xs text-ink-muted leading-relaxed">
-                I confirm I am authorized to run security tests against this target
-                (owned system, staging environment, or explicit written authorization).
-                Unauthorized scanning of third-party systems may be illegal.
-              </span>
-            </label>
-
-            {/* Optional Credentials Panel */}
-            {showAuth && (
-              <div className="mt-4 pt-4 border-t border-border space-y-4">
-                <p className="text-xs text-ink-muted leading-relaxed">
-                  Used only by the cross-account access control check: enter the target account&apos;s User ID under User A, and a different account&apos;s API key under User B, to test whether User B can access User A&apos;s private data.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-canvas border border-border rounded space-y-3">
-                    <div className="text-xs font-semibold text-ink">
-                      User A — Resource Owner
-                    </div>
-                    <div className="space-y-2">
-                      <input
-                        type="text"
-                        placeholder="Target User ID — e.g. usr_a1b2c3"
-                        value={userA.username}
-                        onChange={(e) => setUserA({ ...userA, username: e.target.value })}
-                        className="w-full px-3 py-1.5 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
-                      />
-                      <input
-                        type="text"
-                        placeholder="(unused — leave blank)"
-                        value={userA.password}
-                        onChange={(e) => setUserA({ ...userA, password: e.target.value })}
-                        className="w-full px-3 py-1.5 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
-                      />
-                      <p className="text-[11px] text-ink-faint">Only the Target User ID above is used for this account.</p>
-                    </div>
+          <div className="p-5 sm:p-6">
+            <form onSubmit={handleStartScan} className="space-y-4">
+              {/* Primary Target Input + CTA Button */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-ink">
+                  Target Endpoint URL <span className="text-accent">*</span>
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
+                  <div className="relative flex-1">
+                    <input
+                      type="url"
+                      value={targetUrl}
+                      onChange={(e) => setTargetUrl(e.target.value)}
+                      required
+                      disabled={loading}
+                      placeholder="http://localhost:3000"
+                      className="w-full h-10 px-3.5 bg-canvas border border-border rounded text-ink placeholder-ink-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono text-sm transition-colors disabled:opacity-60"
+                    />
                   </div>
 
-                  <div className="p-4 bg-canvas border border-border rounded space-y-3">
-                    <div className="text-xs font-semibold text-ink">
-                      User B — Attempting Cross-Account Access
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="text"
-                        placeholder="Username (optional)"
-                        value={userB.username}
-                        onChange={(e) => setUserB({ ...userB, username: e.target.value })}
-                        className="px-3 py-1.5 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
-                      />
-                      <input
-                        type="password"
-                        placeholder="Account B's API key"
-                        value={userB.password}
-                        onChange={(e) => setUserB({ ...userB, password: e.target.value })}
-                        className="px-3 py-1.5 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
-                      />
-                    </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAuth(!showAuth)}
+                      className={`h-10 px-3.5 rounded border text-xs font-medium transition-colors flex items-center justify-center gap-2 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-accent ${
+                        showAuth 
+                          ? 'bg-canvas-overlay border-border text-ink' 
+                          : 'bg-canvas-raised border-border text-ink-muted hover:text-ink hover:bg-canvas-overlay'
+                      }`}
+                    >
+                      <KeyRound className="w-3.5 h-3.5 text-ink-muted" />
+                      <span>Credentials</span>
+                      <span className="text-[10px] text-ink-faint">{showAuth ? '▲' : '▼'}</span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={loading || !confirmAuthorized}
+                      title={!confirmAuthorized ? 'Please confirm authorization below to start scan' : 'Start Security Scan'}
+                      className="h-10 px-5 bg-accent hover:bg-accent-hover active:bg-accent disabled:bg-canvas-raised disabled:text-ink-faint disabled:border disabled:border-border disabled:cursor-not-allowed text-white font-medium text-xs rounded transition-colors flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-accent shadow-subtle min-w-[120px]"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin text-white flex-shrink-0" />
+                          <span>Scanning...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-3.5 h-3.5 text-white fill-current flex-shrink-0" />
+                          <span>Start Scan</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
+
+              {/* Distinct Authorization Confirmation Box */}
+              <div className={`p-3.5 rounded border transition-colors ${
+                confirmAuthorized 
+                  ? 'bg-canvas-overlay/70 border-accent/40' 
+                  : 'bg-canvas-overlay/30 border-border hover:border-ink-faint'
+              }`}>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={confirmAuthorized}
+                    onChange={(e) => setConfirmAuthorized(e.target.checked)}
+                    disabled={loading}
+                    className="mt-0.5 w-4 h-4 rounded border-border bg-canvas text-accent focus:ring-accent focus:ring-offset-canvas cursor-pointer"
+                  />
+                  <div className="flex-1 text-xs">
+                    <span className="font-medium text-ink block sm:inline">Legal Authorization Confirmation: </span>
+                    <span className="text-ink-muted leading-relaxed">
+                      I confirm I am authorized to execute automated security tests against this target
+                      (owned target, staging deployment, or explicit written penetration testing agreement).
+                      Unauthorized scanning is prohibited.
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              {/* Collapsible Cross-Account Credentials Panel */}
+              {showAuth && (
+                <div className="pt-3 border-t border-border space-y-3">
+                  <div className="flex items-center gap-2 text-xs text-ink-muted">
+                    <Key className="w-3.5 h-3.5 text-accent" />
+                    <span>Cross-Account Access Control Testing (BOLA/IDOR Vector):</span>
+                  </div>
+                  <p className="text-xs text-ink-faint leading-relaxed">
+                    Provide the resource owner target under User A, and an attacker or alternate tenant credentials under User B. The engine will verify object isolation.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div className="p-3.5 bg-canvas border border-border rounded space-y-2.5">
+                      <div className="text-xs font-semibold text-ink flex items-center justify-between">
+                        <span>User A (Resource Owner)</span>
+                        <span className="text-[10px] font-mono text-ink-faint">Account Owner</span>
+                      </div>
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Target User ID (e.g. usr_a1b2c3)"
+                          value={userA.username}
+                          onChange={(e) => setUserA({ ...userA, username: e.target.value })}
+                          disabled={loading}
+                          className="w-full h-8 px-3 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent font-mono"
+                        />
+                        <input
+                          type="text"
+                          placeholder="(Password unused — leave blank)"
+                          value={userA.password}
+                          onChange={(e) => setUserA({ ...userA, password: e.target.value })}
+                          disabled={loading}
+                          className="w-full h-8 px-3 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 bg-canvas border border-border rounded space-y-2.5">
+                      <div className="text-xs font-semibold text-ink flex items-center justify-between">
+                        <span>User B (Cross-Account Attacker)</span>
+                        <span className="text-[10px] font-mono text-ink-faint">Testing Persona</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          placeholder="Username (optional)"
+                          value={userB.username}
+                          onChange={(e) => setUserB({ ...userB, username: e.target.value })}
+                          disabled={loading}
+                          className="w-full h-8 px-3 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent font-mono"
+                        />
+                        <input
+                          type="password"
+                          placeholder="Account B API key"
+                          value={userB.password}
+                          onChange={(e) => setUserB({ ...userB, password: e.target.value })}
+                          disabled={loading}
+                          className="w-full h-8 px-3 bg-canvas-raised border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </form>
+
+            {/* Error Message Display */}
+            {scanError && (
+              <div className="mt-4 flex items-start gap-3 p-3 bg-canvas-overlay border border-severity-critical/40 rounded text-xs">
+                <AlertTriangle className="w-4 h-4 text-severity-critical flex-shrink-0 mt-0.5" />
+                <div className="flex-1 text-severity-critical leading-relaxed">{scanError}</div>
+                <button
+                  onClick={() => setScanError(null)}
+                  className="text-ink-muted hover:text-ink text-xs flex-shrink-0 p-0.5"
+                  aria-label="Dismiss error"
+                >
+                  ✕
+                </button>
+              </div>
             )}
-          </form>
+          </div>
+        </section>
 
-          {scanError && (
-            <div className="mt-4 flex items-start gap-3 p-3 bg-canvas-overlay border border-severity-critical/30 rounded">
-              <AlertTriangle className="w-4 h-4 text-severity-critical flex-shrink-0 mt-0.5" />
-              <div className="flex-1 text-xs text-severity-critical leading-relaxed">{scanError}</div>
-              <button
-                onClick={() => setScanError(null)}
-                className="text-ink-muted hover:text-ink text-xs flex-shrink-0"
-                aria-label="Dismiss error"
-              >
-                ✕
-              </button>
+        {/* 3. Running State Banner (While scan is in flight) */}
+        {loading && (
+          <section aria-label="Scan in Progress" className="bg-canvas-raised border border-accent/30 rounded-lg p-5 flex items-center gap-4">
+            <div className="w-10 h-10 rounded bg-accent-muted border border-accent/20 flex items-center justify-center flex-shrink-0">
+              <Loader2 className="w-5 h-5 text-accent animate-spin" />
             </div>
-          )}
-        </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-ink font-mono">
+                  {scanStatus === 'initializing' ? 'INITIALIZING SECURITY SCANNER' : 'EXECUTING AUTOMATED CHECKS'}
+                </h3>
+                <span className="text-[11px] text-ink-faint">• Target: <span className="font-mono text-ink-muted">{targetUrl}</span></span>
+              </div>
+              <p className="text-xs text-ink-muted mt-0.5">
+                Probing headers, access controls, token security, and injection vectors. Results will display below upon completion.
+              </p>
+            </div>
+          </section>
+        )}
 
-        {/* Scan Status & Stats Bar */}
+        {/* 4. Empty State (When no scan has been executed yet) */}
+        {!loading && !scanData && (
+          <section aria-label="No Assessment" className="bg-canvas-raised border border-border rounded-lg p-10 text-center">
+            <div className="w-12 h-12 rounded bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-3.5 text-ink-faint">
+              <FileSearch className="w-6 h-6" />
+            </div>
+            <h3 className="text-sm font-semibold text-ink">No Security Assessment Loaded</h3>
+            <p className="text-xs text-ink-muted mt-1 max-w-md mx-auto leading-relaxed">
+              Verify your target endpoint above, confirm testing authorization, and select <strong className="text-ink font-medium">Start Scan</strong> to run compliance checks and triage findings.
+            </p>
+          </section>
+        )}
+
+        {/* 5. Security Metrics & Visualizations (When scan data is present) */}
         {scanData && (
-          <div className="space-y-6">
-            <div className="flex items-stretch divide-x divide-border border border-border rounded-lg overflow-hidden bg-canvas-raised">
-              <div 
+          <section aria-label="Security Metrics Summary" className="space-y-6">
+            {/* Section Header & Scan Metadata */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+              <div>
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Assessment Summary</h2>
+                <div className="flex items-center gap-2 text-xs text-ink-faint mt-0.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Duration: {scanData.scan.finishedAt ? Math.round((new Date(scanData.scan.finishedAt) - new Date(scanData.scan.startedAt)) / 1000) : 0}s</span>
+                  <span>•</span>
+                  <span>Scan ID: <code className="text-ink-muted font-mono">{scanData.scan.id}</code></span>
+                </div>
+              </div>
+
+              <div className="text-xs text-ink-faint">
+                Showing: <span className="font-medium text-ink capitalize">{filterSeverity}</span> ({sortedFindings.length} findings)
+              </div>
+            </div>
+
+            {/* Severity Counter Filter Strip */}
+            <div className="flex items-stretch divide-x divide-border border border-border rounded-lg overflow-hidden bg-canvas-raised shadow-subtle">
+              <button 
+                type="button"
                 onClick={() => setFilterSeverity('all')}
                 className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
                   filterSeverity === 'all' ? 'bg-canvas-overlay' : ''
                 }`}
               >
-                <div className="text-2xl font-semibold text-ink">{stats.total}</div>
-                <div className="text-xs text-ink-faint mt-0.5">Total</div>
-              </div>
+                <div className="text-2xl font-semibold text-ink leading-tight">{stats.total}</div>
+                <div className="text-[11px] font-medium text-ink-muted mt-1">Total Findings</div>
+              </button>
 
-              <div 
+              <button 
+                type="button"
                 onClick={() => setFilterSeverity('critical')}
                 className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
                   filterSeverity === 'critical' ? 'bg-canvas-overlay' : ''
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-critical">{stats.critical}</div>
-                <div className="text-xs text-ink-faint mt-0.5">Critical</div>
-              </div>
+                <div className="text-2xl font-semibold text-severity-critical leading-tight">{stats.critical}</div>
+                <div className="text-[11px] font-medium text-severity-critical mt-1">Critical</div>
+              </button>
 
-              <div 
+              <button 
+                type="button"
                 onClick={() => setFilterSeverity('high')}
                 className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
                   filterSeverity === 'high' ? 'bg-canvas-overlay' : ''
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-high">{stats.high}</div>
-                <div className="text-xs text-ink-faint mt-0.5">High</div>
-              </div>
+                <div className="text-2xl font-semibold text-severity-high leading-tight">{stats.high}</div>
+                <div className="text-[11px] font-medium text-severity-high mt-1">High</div>
+              </button>
 
-              <div 
+              <button 
+                type="button"
                 onClick={() => setFilterSeverity('medium')}
                 className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
                   filterSeverity === 'medium' ? 'bg-canvas-overlay' : ''
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-medium">{stats.medium}</div>
-                <div className="text-xs text-ink-faint mt-0.5">Medium</div>
-              </div>
+                <div className="text-2xl font-semibold text-severity-medium leading-tight">{stats.medium}</div>
+                <div className="text-[11px] font-medium text-severity-medium mt-1">Medium</div>
+              </button>
 
-              <div 
+              <button 
+                type="button"
                 onClick={() => setFilterSeverity('low')}
                 className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
                   filterSeverity === 'low' ? 'bg-canvas-overlay' : ''
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-low">{stats.low}</div>
-                <div className="text-xs text-ink-faint mt-0.5">Low</div>
-              </div>
+                <div className="text-2xl font-semibold text-severity-low leading-tight">{stats.low}</div>
+                <div className="text-[11px] font-medium text-severity-low mt-1">Low</div>
+              </button>
             </div>
 
             {/* Coverage Radar & CWE Distribution */}
@@ -376,32 +498,34 @@ export default function Home() {
               <SecurityRadarChart findings={findings} />
               <CategoryDistribution findings={findings} />
             </div>
-
-            <div className="flex items-center justify-between text-xs text-ink-faint px-1">
-              <div className="flex items-center gap-2">
-                <Clock className="w-3.5 h-3.5 text-ink-faint" />
-                <span>Completed in {scanData.scan.finishedAt ? Math.round((new Date(scanData.scan.finishedAt) - new Date(scanData.scan.startedAt)) / 1000) : 0}s</span>
-                <span>•</span>
-                <span>Scan ID: <code className="text-ink-muted font-mono">{scanData.scan.id}</code></span>
-              </div>
-              <div>
-                Showing: <span className="font-medium text-ink capitalize">{filterSeverity}</span> ({sortedFindings.length})
-              </div>
-            </div>
-          </div>
+          </section>
         )}
 
-        {/* Findings List */}
+        {/* 6. Detailed Findings Container */}
         {scanData && (
-          <div className="space-y-3">
+          <section aria-label="Detailed Findings" className="space-y-3">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">
+                Detailed Findings ({sortedFindings.length})
+              </h2>
+              {filterSeverity !== 'all' && (
+                <button
+                  onClick={() => setFilterSeverity('all')}
+                  className="text-xs text-accent hover:underline"
+                >
+                  Clear filter
+                </button>
+              )}
+            </div>
+
             {sortedFindings.length === 0 ? (
-              <div className="p-12 text-center bg-canvas-raised border border-border rounded-lg">
-                <CheckCircle2 className="w-10 h-10 text-severity-low mx-auto mb-3 opacity-80" />
+              <div className="p-10 text-center bg-canvas-raised border border-border rounded-lg">
+                <CheckCircle2 className="w-8 h-8 text-severity-low mx-auto mb-2.5 opacity-80" />
                 <h3 className="text-sm font-semibold text-ink">No findings matching current filter</h3>
                 <p className="text-xs text-ink-muted mt-1">All verified checks for this severity level returned positive compliance.</p>
               </div>
             ) : (
-              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border bg-canvas-raised">
+              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border bg-canvas-raised shadow-subtle">
                 {sortedFindings.map((finding) => {
                   const isExpanded = !!expandedRows[finding.id];
                   return (
@@ -522,7 +646,7 @@ export default function Home() {
                 })}
               </div>
             )}
-          </div>
+          </section>
         )}
       </main>
 
