@@ -15,6 +15,9 @@ import {
   Layers,
   FileSearch,
   ExternalLink,
+  Code2,
+  Terminal,
+  Check,
 } from 'lucide-react';
 import { SEVERITY_ORDER, SEVERITY_COLORS } from '@/lib/severityTheme';
 import BrandLoader from '@/components/BrandLoader';
@@ -417,79 +420,129 @@ export default function Home() {
 
         {/* 5. Security Metrics & Visualizations (When scan data is present) */}
         {scanData && (
-          <section aria-label="Security Metrics Summary" className="space-y-6">
+          <section aria-label="Security Metrics Summary" className="space-y-5">
             {/* Section Header & Scan Metadata */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
               <div>
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Assessment Summary</h2>
-                <div className="flex items-center gap-2 text-xs text-ink-faint mt-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-accent" />
+                  <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Assessment Security Summary</h2>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-ink-faint mt-1">
                   <Clock className="w-3.5 h-3.5" />
                   <span>Duration: {scanData.scan.finishedAt ? Math.round((new Date(scanData.scan.finishedAt) - new Date(scanData.scan.startedAt)) / 1000) : 0}s</span>
+                  <span>•</span>
+                  <span>Target: <span className="font-mono text-ink-muted">{scanData.scan.targetUrl || targetUrl}</span></span>
                   <span>•</span>
                   <span>Scan ID: <code className="text-ink-muted font-mono">{scanData.scan.id}</code></span>
                 </div>
               </div>
 
               <div className="text-xs text-ink-faint">
-                Showing: <span className="font-medium text-ink capitalize">{filterSeverity}</span> ({sortedFindings.length} findings)
+                Showing: <span className="font-medium text-ink capitalize">{filterSeverity}</span> ({sortedFindings.length} of {findings.length} findings)
               </div>
             </div>
 
-            {/* Severity Counter Filter Strip */}
-            <div className="flex items-stretch divide-x divide-border border border-border rounded-lg overflow-hidden bg-canvas-raised shadow-subtle">
+            {/* Unified Security Metrics Summary Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              {/* Total Findings (Overall Security Picture) */}
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('all')}
-                className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
-                  filterSeverity === 'all' ? 'bg-canvas-overlay' : ''
+                className={`col-span-2 sm:col-span-1 p-3.5 rounded border text-left transition-all relative overflow-hidden flex flex-col justify-between ${
+                  filterSeverity === 'all'
+                    ? 'bg-canvas-overlay border-accent shadow-subtle ring-1 ring-accent'
+                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-ink-faint'
                 }`}
               >
-                <div className="text-2xl font-semibold text-ink leading-tight">{stats.total}</div>
-                <div className="text-[11px] font-medium text-ink-muted mt-1">Total Findings</div>
+                <div className="flex items-center justify-between text-ink-muted text-xs">
+                  <span className="font-medium">Total Findings</span>
+                  <span className="text-[10px] font-mono uppercase text-ink-faint">All</span>
+                </div>
+                <div className="mt-2.5 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold text-ink tracking-tight font-mono">{stats.total}</span>
+                  <span className="text-[11px] text-ink-faint">detected</span>
+                </div>
               </button>
 
+              {/* Critical */}
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('critical')}
-                className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
-                  filterSeverity === 'critical' ? 'bg-canvas-overlay' : ''
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                  filterSeverity === 'critical'
+                    ? 'bg-severity-critical/15 border-severity-critical ring-1 ring-severity-critical'
+                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-critical/40'
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-critical leading-tight">{stats.critical}</div>
-                <div className="text-[11px] font-medium text-severity-critical mt-1">Critical</div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-ink-muted">Critical</span>
+                  <span className="w-2 h-2 rounded-full bg-severity-critical flex-shrink-0" />
+                </div>
+                <div className="mt-2.5 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold text-severity-critical tracking-tight font-mono">{stats.critical}</span>
+                  <span className="text-[11px] text-ink-faint">high-risk</span>
+                </div>
               </button>
 
+              {/* High */}
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('high')}
-                className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
-                  filterSeverity === 'high' ? 'bg-canvas-overlay' : ''
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                  filterSeverity === 'high'
+                    ? 'bg-severity-high/15 border-severity-high ring-1 ring-severity-high'
+                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-high/40'
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-high leading-tight">{stats.high}</div>
-                <div className="text-[11px] font-medium text-severity-high mt-1">High</div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-ink-muted">High</span>
+                  <span className="w-2 h-2 rounded-full bg-severity-high flex-shrink-0" />
+                </div>
+                <div className="mt-2.5 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold text-severity-high tracking-tight font-mono">{stats.high}</span>
+                  <span className="text-[11px] text-ink-faint">urgent</span>
+                </div>
               </button>
 
+              {/* Medium */}
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('medium')}
-                className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
-                  filterSeverity === 'medium' ? 'bg-canvas-overlay' : ''
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                  filterSeverity === 'medium'
+                    ? 'bg-severity-medium/15 border-severity-medium ring-1 ring-severity-medium'
+                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-medium/40'
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-medium leading-tight">{stats.medium}</div>
-                <div className="text-[11px] font-medium text-severity-medium mt-1">Medium</div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-ink-muted">Medium</span>
+                  <span className="w-2 h-2 rounded-full bg-severity-medium flex-shrink-0" />
+                </div>
+                <div className="mt-2.5 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold text-severity-medium tracking-tight font-mono">{stats.medium}</span>
+                  <span className="text-[11px] text-ink-faint">moderate</span>
+                </div>
               </button>
 
+              {/* Low */}
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('low')}
-                className={`flex-1 px-4 py-3 text-center cursor-pointer transition-colors hover:bg-canvas-overlay ${
-                  filterSeverity === 'low' ? 'bg-canvas-overlay' : ''
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                  filterSeverity === 'low'
+                    ? 'bg-severity-low/15 border-severity-low ring-1 ring-severity-low'
+                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-low/40'
                 }`}
               >
-                <div className="text-2xl font-semibold text-severity-low leading-tight">{stats.low}</div>
-                <div className="text-[11px] font-medium text-severity-low mt-1">Low</div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-ink-muted">Low</span>
+                  <span className="w-2 h-2 rounded-full bg-severity-low flex-shrink-0" />
+                </div>
+                <div className="mt-2.5 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold text-severity-low tracking-tight font-mono">{stats.low}</span>
+                  <span className="text-[11px] text-ink-faint">informational</span>
+                </div>
               </button>
             </div>
 
@@ -505,24 +558,50 @@ export default function Home() {
         {scanData && (
           <section aria-label="Detailed Findings" className="space-y-3">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">
-                Detailed Findings ({sortedFindings.length})
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">
+                  Security Findings List ({sortedFindings.length})
+                </h2>
+                {filterSeverity !== 'all' && (
+                  <span className="text-[11px] font-mono text-accent">
+                    [Filtered by: {filterSeverity}]
+                  </span>
+                )}
+              </div>
               {filterSeverity !== 'all' && (
                 <button
                   onClick={() => setFilterSeverity('all')}
-                  className="text-xs text-accent hover:underline"
+                  className="text-xs text-accent hover:underline focus-visible:ring-2 focus-visible:ring-accent rounded"
                 >
-                  Clear filter
+                  Reset filter (show all {findings.length})
                 </button>
               )}
             </div>
 
-            {sortedFindings.length === 0 ? (
-              <div className="p-10 text-center bg-canvas-raised border border-border rounded-lg">
-                <CheckCircle2 className="w-8 h-8 text-severity-low mx-auto mb-2.5 opacity-80" />
-                <h3 className="text-sm font-semibold text-ink">No findings matching current filter</h3>
-                <p className="text-xs text-ink-muted mt-1">All verified checks for this severity level returned positive compliance.</p>
+            {/* Zero Findings State for Completed Scan vs Filtered Out */}
+            {findings.length === 0 ? (
+              <div className="p-12 text-center bg-canvas-raised border border-border rounded-lg shadow-subtle">
+                <CheckCircle2 className="w-10 h-10 text-severity-low mx-auto mb-3 opacity-90" />
+                <h3 className="text-sm font-semibold text-ink">No Vulnerabilities Detected</h3>
+                <p className="text-xs text-ink-muted mt-1 max-w-md mx-auto leading-relaxed">
+                  All automated checks against <span className="font-mono text-ink">{targetUrl}</span> passed cleanly. No security findings were identified.
+                </p>
+              </div>
+            ) : sortedFindings.length === 0 ? (
+              <div className="p-10 text-center bg-canvas-raised border border-border rounded-lg shadow-subtle">
+                <div className="w-8 h-8 rounded bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-2.5 text-ink-faint">
+                  <CheckCircle2 className="w-4 h-4 text-severity-low" />
+                </div>
+                <h3 className="text-sm font-semibold text-ink">No Findings for Current Severity</h3>
+                <p className="text-xs text-ink-muted mt-1">
+                  Zero vulnerabilities were categorized under the <strong className="text-ink font-medium capitalize">{filterSeverity}</strong> severity tier.
+                </p>
+                <button
+                  onClick={() => setFilterSeverity('all')}
+                  className="mt-3 text-xs text-accent hover:underline font-medium"
+                >
+                  View all {findings.length} findings
+                </button>
               </div>
             ) : (
               <div className="border border-border rounded-lg overflow-hidden divide-y divide-border bg-canvas-raised shadow-subtle">
@@ -530,92 +609,129 @@ export default function Home() {
                   const isExpanded = !!expandedRows[finding.id];
                   return (
                     <div key={finding.id} className="transition-colors">
-                      {/* Collapsible Row Header */}
+                      {/* Professional Collapsible Findings Row Header */}
                       <div
                         onClick={() => toggleRow(finding.id)}
-                        className="p-4 cursor-pointer flex items-center justify-between gap-4 select-none hover:bg-canvas-overlay transition-colors"
+                        className={`p-3.5 sm:p-4 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 select-none transition-colors ${
+                          isExpanded ? 'bg-canvas-overlay/70' : 'hover:bg-canvas-overlay/50'
+                        }`}
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {isExpanded ? (
-                            <ChevronDown className="w-4 h-4 text-ink-muted flex-shrink-0" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4 text-ink-muted flex-shrink-0" />
-                          )}
-
+                          {/* Severity Indicator Badge */}
                           <span
-                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border tracking-wide flex-shrink-0 ${
-                              SEVERITY_COLORS[finding.severity] || 'bg-canvas text-ink'
+                            className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded border tracking-wide flex-shrink-0 min-w-[62px] text-center ${
+                              SEVERITY_COLORS[finding.severity] || 'bg-canvas text-ink border-border'
                             }`}
                           >
                             {finding.severity}
                           </span>
 
-                          <div className="truncate">
-                            <span className="font-medium text-sm text-ink">
-                              {finding.title}
-                            </span>
-                            <span className="ml-2 text-xs text-ink-faint font-mono hidden sm:inline">
-                              [{finding.category}]
-                            </span>
+                          {/* Finding Title & Secondary Context */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-xs sm:text-sm text-ink truncate leading-tight">
+                                {finding.title}
+                              </span>
+                              {finding.cweId && (
+                                <span className="text-[10px] font-mono text-ink-faint px-1.5 py-0.5 rounded bg-canvas border border-border flex-shrink-0 hidden md:inline">
+                                  {finding.cweId}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-ink-faint truncate mt-0.5 flex items-center gap-1.5 font-mono">
+                              <span>{finding.category}</span>
+                              {finding.affectedComponent && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-ink-muted truncate">{finding.affectedComponent}</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3 flex-shrink-0">
-                          <span className="text-xs px-2 py-0.5 rounded bg-canvas border border-border text-ink-muted font-mono hidden md:inline">
-                            {finding.confidence}
-                          </span>
-                          <span className="text-xs text-ink-faint hidden lg:inline">
+                        {/* Metadata & Expansion Caret */}
+                        <div className="flex items-center gap-2.5 sm:gap-4 flex-shrink-0">
+                          {finding.confidence && (
+                            <span className="text-[11px] px-2 py-0.5 rounded bg-canvas border border-border text-ink-muted font-mono hidden sm:inline">
+                              conf: {finding.confidence}
+                            </span>
+                          )}
+                          <span className="text-[11px] text-ink-faint font-mono hidden lg:inline">
                             {finding.checkId}
                           </span>
+                          <div className="w-5 h-5 flex items-center justify-center text-ink-muted">
+                            {isExpanded ? (
+                              <ChevronDown className="w-4 h-4 text-accent flex-shrink-0" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-ink-faint flex-shrink-0" />
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Expanded Detail Panel */}
+                      {/* Professional Expanded Findings Detail View */}
                       {isExpanded && (
-                        <div className="p-6 border-t border-border bg-canvas space-y-5 text-sm">
-                          {/* Meta row */}
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-3 bg-canvas-raised rounded border border-border text-xs">
+                        <div className="p-5 sm:p-6 border-t border-border bg-canvas space-y-5 text-sm">
+                          {/* Technical Metadata Matrix */}
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 p-3.5 bg-canvas-raised rounded border border-border text-xs">
                             <div>
-                              <span className="text-ink-faint block">Affected Component:</span>
-                              <span className="font-mono text-ink-muted break-all">{finding.affectedComponent}</span>
+                              <span className="text-ink-faint text-[10px] font-mono uppercase block">Affected Target</span>
+                              <span className="font-mono text-ink text-xs break-all mt-0.5 block">{finding.affectedComponent || 'Endpoint root'}</span>
                             </div>
                             <div>
-                              <span className="text-ink-faint block">Reference Score:</span>
-                              <span className="font-mono text-ink-muted">{finding.referenceScore || 'N/A'}</span>
+                              <span className="text-ink-faint text-[10px] font-mono uppercase block">Category / Vector</span>
+                              <span className="capitalize text-ink font-medium mt-0.5 block">{finding.category}</span>
                             </div>
                             <div>
-                              <span className="text-ink-faint block">Category:</span>
-                              <span className="capitalize text-ink font-medium">{finding.category}</span>
+                              <span className="text-ink-faint text-[10px] font-mono uppercase block">Confidence / Check</span>
+                              <span className="font-mono text-ink-muted text-xs mt-0.5 block">
+                                {finding.confidence || 'Medium'} • {finding.checkId || 'engine-v1'}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-ink-faint text-[10px] font-mono uppercase block">Reference / CWE</span>
+                              <span className="font-mono text-accent text-xs mt-0.5 block">
+                                {finding.cweId || finding.referenceScore || 'Standard-Sec'}
+                              </span>
                             </div>
                           </div>
 
-                          {/* Description */}
+                          {/* Vulnerability Description */}
                           <div>
-                            <h4 className="text-xs font-semibold text-ink mb-1">
-                              Description
-                            </h4>
-                            <p className="text-ink-muted leading-relaxed text-sm">{finding.description}</p>
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <h4 className="text-xs font-semibold uppercase tracking-wider text-ink">
+                                Vulnerability Analysis
+                              </h4>
+                            </div>
+                            <p className="text-ink-muted leading-relaxed text-xs sm:text-sm">{finding.description}</p>
                           </div>
 
-                          {/* Steps to Reproduce */}
+                          {/* Reproduction Steps */}
                           {finding.stepsToReproduce && (
                             <div>
-                              <h4 className="text-xs font-semibold text-ink mb-1">
-                                Steps to Reproduce
-                              </h4>
-                              <pre className="p-3 bg-canvas-raised border border-border rounded text-xs font-mono text-ink-muted whitespace-pre-wrap leading-relaxed">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <Terminal className="w-3.5 h-3.5 text-accent" />
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-ink font-mono">
+                                  Verification / Reproduction Steps
+                                </h4>
+                              </div>
+                              <pre className="p-3.5 bg-canvas-raised border border-border rounded text-xs font-mono text-ink-muted whitespace-pre-wrap leading-relaxed overflow-x-auto">
                                 {finding.stepsToReproduce}
                               </pre>
                             </div>
                           )}
 
-                          {/* Evidence View */}
+                          {/* HTTP Evidence Payload */}
                           {finding.evidence && (
                             <div>
-                              <h4 className="text-xs font-semibold text-ink mb-1">
-                                Observed HTTP Evidence
-                              </h4>
-                              <pre className="p-3 bg-canvas-raised border border-border rounded text-xs font-mono text-ink-muted overflow-x-auto max-h-72 overflow-y-auto leading-relaxed">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <Code2 className="w-3.5 h-3.5 text-ink-muted" />
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-ink font-mono">
+                                  Captured HTTP Evidence
+                                </h4>
+                              </div>
+                              <pre className="p-3.5 bg-canvas-raised border border-border rounded text-xs font-mono text-ink-muted overflow-x-auto max-h-72 overflow-y-auto leading-relaxed border-l-2 border-l-accent">
                                 {typeof finding.evidence === 'object'
                                   ? JSON.stringify(finding.evidence, null, 2)
                                   : finding.evidence}
@@ -623,20 +739,26 @@ export default function Home() {
                             </div>
                           )}
 
-                          {/* Business Impact & Remediation */}
+                          {/* Operational Impact & Remediation Guidance */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="p-4 bg-canvas-raised border border-border rounded space-y-1">
-                              <h5 className="text-xs font-semibold text-ink">
-                                Operational / Business Impact
+                            <div className="p-4 bg-canvas-raised border border-border rounded space-y-1.5">
+                              <h5 className="text-xs font-semibold uppercase tracking-wider text-severity-high font-mono flex items-center gap-1.5">
+                                <AlertTriangle className="w-3.5 h-3.5 text-severity-high" />
+                                Operational / Business Risk
                               </h5>
-                              <p className="text-xs text-ink-muted leading-relaxed">{finding.businessImpact}</p>
+                              <p className="text-xs text-ink-muted leading-relaxed">
+                                {finding.businessImpact || 'Exposure of internal endpoints, potential data tampering, or authentication circumvention.'}
+                              </p>
                             </div>
 
-                            <div className="p-4 bg-canvas-raised border border-border rounded space-y-1">
-                              <h5 className="text-xs font-semibold text-ink">
-                                Remediation Guidance
+                            <div className="p-4 bg-canvas-raised border border-border rounded space-y-1.5">
+                              <h5 className="text-xs font-semibold uppercase tracking-wider text-severity-low font-mono flex items-center gap-1.5">
+                                <Shield className="w-3.5 h-3.5 text-severity-low" />
+                                Remediation Recommendation
                               </h5>
-                              <p className="text-xs text-ink-muted leading-relaxed">{finding.remediation}</p>
+                              <p className="text-xs text-ink-muted leading-relaxed">
+                                {finding.remediation || 'Enforce strict access controls, sanitize input boundaries, and review security response headers.'}
+                              </p>
                             </div>
                           </div>
                         </div>
