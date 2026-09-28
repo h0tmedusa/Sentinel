@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Shield, Radio, AlertTriangle, History, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
@@ -15,6 +16,15 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onMobileClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen, onMobileClose]);
 
   const handleNavigate = (href) => {
     onMobileClose();
@@ -38,7 +48,8 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
             <button
               key={item.id}
               onClick={() => handleNavigate(item.href)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-medium transition-colors ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 isActive ? NAV_ITEM_STATE.active : NAV_ITEM_STATE.inactive
               }`}
             >
@@ -71,7 +82,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
               onClick={logout}
               title="Sign Out"
               aria-label="Sign Out"
-              className="p-1.5 rounded text-ink-muted hover:text-severity-critical hover:bg-canvas-raised transition-colors focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
+              className="p-1.5 rounded text-ink-muted hover:text-severity-critical hover:bg-canvas-raised transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -84,13 +95,13 @@ export function Sidebar({ mobileOpen = false, onMobileClose = () => {} }) {
   return (
     <>
       {/* Desktop Persistent Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-56 lg:fixed lg:inset-y-0 lg:z-30">
+      <aside className="hidden lg:flex lg:flex-col lg:w-56 lg:fixed lg:inset-y-0 lg:z-30" aria-label="Main Navigation">
         {navContent}
       </aside>
 
       {/* Mobile Drawer Overlay */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
+        <div className="lg:hidden fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-label="Mobile Navigation Drawer">
           <div
             className="fixed inset-0 bg-black/60 transition-opacity"
             onClick={onMobileClose}

@@ -56,7 +56,7 @@ export default function SignupPage() {
         </div>
 
         {error && (
-          <div className="flex items-start gap-2.5 p-3 rounded bg-canvas-overlay border border-severity-critical/30 text-xs text-severity-critical">
+          <div role="alert" className="flex items-start gap-2.5 p-3 rounded bg-canvas-overlay border border-severity-critical/30 text-xs text-severity-critical">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span className="flex-1 leading-relaxed">{error}</span>
           </div>
@@ -69,9 +69,11 @@ export default function SignupPage() {
             </label>
             <input
               id="username"
+              name="username"
               type="text"
               required
               autoFocus
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g. johndoe"
@@ -85,6 +87,7 @@ export default function SignupPage() {
             </label>
             <select
               id="role"
+              name="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-3 py-2 bg-canvas border border-border rounded text-sm text-ink focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
@@ -100,8 +103,10 @@ export default function SignupPage() {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               required
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Min. 6 characters"
@@ -115,8 +120,10 @@ export default function SignupPage() {
             </label>
             <input
               id="confirmPassword"
+              name="confirmPassword"
               type="password"
               required
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter password"
@@ -127,7 +134,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2 px-4 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-2 px-4 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Check, Copy, Download, Code2, ShieldAlert, Sparkles, FileDiff, Layers } from 'lucide-react';
 import { SEVERITY_BADGE } from '@/lib/severityTheme';
 
@@ -8,6 +8,14 @@ export default function RemediationModal({ finding, onClose }) {
   const [activeTab, setActiveTab] = useState('diff');
   const [copied, setCopied] = useState(false);
   const [selectedFramework, setSelectedFramework] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   if (!finding) return null;
 
@@ -58,7 +66,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="remediation-modal-title">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
@@ -78,14 +86,14 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                 {finding.cweId}
               </span>
             )}
-            <h2 className="text-sm font-semibold text-ink truncate">
+            <h2 id="remediation-modal-title" className="text-sm font-semibold text-ink truncate">
               {finding.title}
             </h2>
           </div>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1 rounded text-ink-muted hover:text-ink hover:bg-canvas-overlay transition-colors focus-visible:ring-2 focus-visible:ring-accent"
+            className="p-1 rounded text-ink-muted hover:text-ink hover:bg-canvas-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <X className="w-5 h-5" />
           </button>
@@ -96,7 +104,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
           <div className="flex items-center gap-6">
             <button
               onClick={() => setActiveTab('diff')}
-              className={`flex items-center gap-1.5 py-3 text-xs font-medium border-b-2 transition-colors focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`flex items-center gap-1.5 py-3 text-xs font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 activeTab === 'diff'
                   ? 'border-accent text-ink'
                   : 'border-transparent text-ink-muted hover:text-ink'
@@ -107,7 +115,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
             </button>
             <button
               onClick={() => setActiveTab('frameworks')}
-              className={`flex items-center gap-1.5 py-3 text-xs font-medium border-b-2 transition-colors focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`flex items-center gap-1.5 py-3 text-xs font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 activeTab === 'frameworks'
                   ? 'border-accent text-ink'
                   : 'border-transparent text-ink-muted hover:text-ink'
@@ -126,7 +134,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                   <button
                     key={fw}
                     onClick={() => setSelectedFramework(fw)}
-                    className={`px-2 py-1 rounded text-xs capitalize transition-colors focus-visible:ring-2 focus-visible:ring-accent ${
+                    className={`px-2 py-1 rounded text-xs capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                       currentFramework === fw
                         ? 'bg-accent-muted text-accent border border-accent/40 font-medium'
                         : 'bg-canvas-overlay text-ink-muted hover:text-ink border border-border'
@@ -152,14 +160,14 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => copyToClipboard(diffContent)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:ring-2 focus-visible:ring-accent"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-accent" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Copied' : 'Copy Diff'}
                   </button>
                   <button
                     onClick={downloadDiff}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:ring-2 focus-visible:ring-accent"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Download
@@ -189,7 +197,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                     </div>
                     <button
                       onClick={() => copyToClipboard(secureCode)}
-                      className="text-[11px] text-accent hover:text-accent-hover flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent"
+                      className="text-[11px] text-accent hover:text-accent-hover flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       <Copy className="w-3 h-3" />
                       Copy Code
@@ -217,7 +225,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                       </span>
                       <button
                         onClick={() => copyToClipboard(patchSnippets[fw])}
-                        className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 transition-colors focus-visible:ring-2 focus-visible:ring-accent"
+                        className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                       >
                         <Copy className="w-3 h-3" />
                         Copy Snippet
@@ -238,21 +246,21 @@ ${finding.remediation || '// Apply security policy and input validation as speci
               Compliance &amp; Mapping Standards
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 rounded bg-canvas border border-border">
+              <div className="p-2 rounded bg-canvas border border-border min-w-0">
                 <span className="text-[10px] text-ink-faint block">OWASP Category</span>
-                <span className="text-ink font-medium">{finding.owaspCategory || 'N/A'}</span>
+                <span className="text-ink font-medium break-words">{finding.owaspCategory || 'N/A'}</span>
               </div>
-              <div className="p-2 rounded bg-canvas border border-border">
+              <div className="p-2 rounded bg-canvas border border-border min-w-0">
                 <span className="text-[10px] text-ink-faint block">MITRE Technique</span>
-                <span className="text-ink font-medium">{finding.mitreTechnique || 'N/A'}</span>
+                <span className="text-ink font-medium break-words">{finding.mitreTechnique || 'N/A'}</span>
               </div>
-              <div className="p-2 rounded bg-canvas border border-border">
+              <div className="p-2 rounded bg-canvas border border-border min-w-0">
                 <span className="text-[10px] text-ink-faint block">NIST Control</span>
-                <span className="text-ink font-medium">{finding.nistMapping || 'N/A'}</span>
+                <span className="text-ink font-medium break-words">{finding.nistMapping || 'N/A'}</span>
               </div>
-              <div className="p-2 rounded bg-canvas border border-border">
+              <div className="p-2 rounded bg-canvas border border-border min-w-0">
                 <span className="text-[10px] text-ink-faint block">ISO 27001</span>
-                <span className="text-ink font-medium">{finding.iso27001 || 'N/A'}</span>
+                <span className="text-ink font-medium break-words">{finding.iso27001 || 'N/A'}</span>
               </div>
             </div>
           </div>

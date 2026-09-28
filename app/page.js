@@ -210,6 +210,29 @@ export default function Home() {
       {/* Main Content Area */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-6">
 
+        {/* Mobile Header Banner (Visible on mobile only) */}
+        <div className="lg:hidden flex flex-col gap-1 pb-1">
+          <div className="flex items-center justify-between gap-2">
+            <h1 className="text-sm font-semibold text-ink tracking-tight">Security Dashboard</h1>
+            {loading ? (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-accent-muted border border-accent/30 text-accent font-medium font-mono text-[10px]">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                SCANNING
+              </span>
+            ) : scanData ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-canvas-overlay border border-border text-ink-muted text-[10px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-severity-low" />
+                {findings.length} FINDINGS
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-canvas-overlay border border-border text-ink-faint text-[10px] font-mono">
+                READY
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-ink-faint">Automated Assessment &amp; Validation • Dev Scope</p>
+        </div>
+
         {/* 2. Primary Scan Configuration Section */}
         <section aria-label="Scan Configuration" className="bg-canvas-raised border border-border rounded-lg shadow-subtle overflow-hidden">
           {/* Section Header */}
@@ -225,12 +248,13 @@ export default function Home() {
             <form onSubmit={handleStartScan} className="space-y-4">
               {/* Primary Target Input + CTA Button */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-medium text-ink">
+                <label htmlFor="target-endpoint-url" className="block text-xs font-medium text-ink">
                   Target Endpoint URL <span className="text-accent">*</span>
                 </label>
                 <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
                   <div className="relative flex-1">
                     <input
+                      id="target-endpoint-url"
                       type="url"
                       value={targetUrl}
                       onChange={(e) => setTargetUrl(e.target.value)}
@@ -245,7 +269,9 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={() => setShowAuth(!showAuth)}
-                      className={`h-10 px-3.5 rounded border text-xs font-medium transition-colors flex items-center justify-center gap-2 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-accent ${
+                      aria-expanded={showAuth}
+                      aria-controls="credentials-panel"
+                      className={`h-10 px-3.5 rounded border text-xs font-medium transition-colors flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                         showAuth 
                           ? 'bg-canvas-overlay border-border text-ink' 
                           : 'bg-canvas-raised border-border text-ink-muted hover:text-ink hover:bg-canvas-overlay'
@@ -260,7 +286,7 @@ export default function Home() {
                       type="submit"
                       disabled={loading || !confirmAuthorized}
                       title={!confirmAuthorized ? 'Please confirm authorization below to start scan' : 'Start Security Scan'}
-                      className="h-10 px-5 bg-accent hover:bg-accent-hover active:bg-accent disabled:bg-canvas-raised disabled:text-ink-faint disabled:border disabled:border-border disabled:cursor-not-allowed text-white font-medium text-xs rounded transition-colors flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-accent shadow-subtle min-w-[120px]"
+                      className="h-10 px-5 bg-accent hover:bg-accent-hover active:bg-accent disabled:bg-canvas-raised disabled:text-ink-faint disabled:border disabled:border-border disabled:cursor-not-allowed text-white font-medium text-xs rounded transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle min-w-[120px]"
                     >
                       {loading ? (
                         <>
@@ -284,13 +310,14 @@ export default function Home() {
                   ? 'bg-canvas-overlay/70 border-accent/40' 
                   : 'bg-canvas-overlay/30 border-border hover:border-ink-faint'
               }`}>
-                <label className="flex items-start gap-3 cursor-pointer select-none">
+                <label htmlFor="confirm-authorization-checkbox" className="flex items-start gap-3 cursor-pointer select-none">
                   <input
+                    id="confirm-authorization-checkbox"
                     type="checkbox"
                     checked={confirmAuthorized}
                     onChange={(e) => setConfirmAuthorized(e.target.checked)}
                     disabled={loading}
-                    className="mt-0.5 w-4 h-4 rounded border-border bg-canvas text-accent focus:ring-accent focus:ring-offset-canvas cursor-pointer"
+                    className="mt-0.5 w-4 h-4 rounded border-border bg-canvas text-accent focus:ring-accent focus:ring-offset-canvas cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   />
                   <div className="flex-1 text-xs">
                     <span className="font-medium text-ink block sm:inline">Legal Authorization Confirmation: </span>
@@ -305,7 +332,7 @@ export default function Home() {
 
               {/* Collapsible Cross-Account Credentials Panel */}
               {showAuth && (
-                <div className="pt-3 border-t border-border space-y-3">
+                <div id="credentials-panel" className="pt-3 border-t border-border space-y-3">
                   <div className="flex items-center gap-2 text-xs text-ink-muted">
                     <Key className="w-3.5 h-3.5 text-accent" />
                     <span>Cross-Account Access Control Testing (BOLA/IDOR Vector):</span>
@@ -322,6 +349,7 @@ export default function Home() {
                       <div className="space-y-2">
                         <input
                           type="text"
+                          aria-label="User A Target User ID"
                           placeholder="Target User ID (e.g. usr_a1b2c3)"
                           value={userA.username}
                           onChange={(e) => setUserA({ ...userA, username: e.target.value })}
@@ -330,6 +358,7 @@ export default function Home() {
                         />
                         <input
                           type="text"
+                          aria-label="User A Password (optional)"
                           placeholder="(Password unused — leave blank)"
                           value={userA.password}
                           onChange={(e) => setUserA({ ...userA, password: e.target.value })}
@@ -344,9 +373,10 @@ export default function Home() {
                         <span>User B (Cross-Account Attacker)</span>
                         <span className="text-[10px] font-mono text-ink-faint">Testing Persona</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <input
                           type="text"
+                          aria-label="User B Username"
                           placeholder="Username (optional)"
                           value={userB.username}
                           onChange={(e) => setUserB({ ...userB, username: e.target.value })}
@@ -355,6 +385,7 @@ export default function Home() {
                         />
                         <input
                           type="password"
+                          aria-label="User B API key"
                           placeholder="Account B API key"
                           value={userB.password}
                           onChange={(e) => setUserB({ ...userB, password: e.target.value })}
@@ -370,12 +401,12 @@ export default function Home() {
 
             {/* Error Message Display */}
             {scanError && (
-              <div className="mt-4 flex items-start gap-3 p-3 bg-canvas-overlay border border-severity-critical/40 rounded text-xs">
+              <div role="alert" className="mt-4 flex items-start gap-3 p-3 bg-canvas-overlay border border-severity-critical/40 rounded text-xs">
                 <AlertTriangle className="w-4 h-4 text-severity-critical flex-shrink-0 mt-0.5" />
                 <div className="flex-1 text-severity-critical leading-relaxed">{scanError}</div>
                 <button
                   onClick={() => setScanError(null)}
-                  className="text-ink-muted hover:text-ink text-xs flex-shrink-0 p-0.5"
+                  className="text-ink-muted hover:text-ink text-xs flex-shrink-0 p-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   aria-label="Dismiss error"
                 >
                   ✕
@@ -449,7 +480,9 @@ export default function Home() {
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('all')}
-                className={`col-span-2 sm:col-span-1 p-3.5 rounded border text-left transition-all relative overflow-hidden flex flex-col justify-between ${
+                aria-pressed={filterSeverity === 'all'}
+                aria-label={`Show all ${stats.total} findings`}
+                className={`col-span-2 sm:col-span-1 p-3.5 rounded border text-left transition-all relative overflow-hidden flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   filterSeverity === 'all'
                     ? 'bg-canvas-overlay border-accent shadow-subtle ring-1 ring-accent'
                     : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-ink-faint'
@@ -469,7 +502,9 @@ export default function Home() {
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('critical')}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                aria-pressed={filterSeverity === 'critical'}
+                aria-label={`Filter by critical severity, ${stats.critical} findings`}
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   filterSeverity === 'critical'
                     ? 'bg-severity-critical/15 border-severity-critical ring-1 ring-severity-critical'
                     : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-critical/40'
@@ -489,7 +524,9 @@ export default function Home() {
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('high')}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                aria-pressed={filterSeverity === 'high'}
+                aria-label={`Filter by high severity, ${stats.high} findings`}
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   filterSeverity === 'high'
                     ? 'bg-severity-high/15 border-severity-high ring-1 ring-severity-high'
                     : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-high/40'
@@ -509,7 +546,9 @@ export default function Home() {
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('medium')}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                aria-pressed={filterSeverity === 'medium'}
+                aria-label={`Filter by medium severity, ${stats.medium} findings`}
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   filterSeverity === 'medium'
                     ? 'bg-severity-medium/15 border-severity-medium ring-1 ring-severity-medium'
                     : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-medium/40'
@@ -529,7 +568,9 @@ export default function Home() {
               <button 
                 type="button"
                 onClick={() => setFilterSeverity('low')}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between ${
+                aria-pressed={filterSeverity === 'low'}
+                aria-label={`Filter by low severity, ${stats.low} findings`}
+                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   filterSeverity === 'low'
                     ? 'bg-severity-low/15 border-severity-low ring-1 ring-severity-low'
                     : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-low/40'
@@ -598,7 +639,7 @@ export default function Home() {
                 </p>
                 <button
                   onClick={() => setFilterSeverity('all')}
-                  className="mt-3 text-xs text-accent hover:underline font-medium"
+                  className="mt-3 text-xs text-accent hover:underline font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
                 >
                   View all {findings.length} findings
                 </button>
@@ -611,8 +652,18 @@ export default function Home() {
                     <div key={finding.id} className="transition-colors">
                       {/* Professional Collapsible Findings Row Header */}
                       <div
+                        role="button"
+                        tabIndex={0}
+                        aria-expanded={isExpanded}
+                        aria-label={`${finding.severity} severity finding: ${finding.title}. Click or press Enter to expand details.`}
                         onClick={() => toggleRow(finding.id)}
-                        className={`p-3.5 sm:p-4 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 select-none transition-colors ${
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleRow(finding.id);
+                          }
+                        }}
+                        className={`p-3.5 sm:p-4 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 select-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                           isExpanded ? 'bg-canvas-overlay/70' : 'hover:bg-canvas-overlay/50'
                         }`}
                       >
@@ -674,26 +725,43 @@ export default function Home() {
                       {isExpanded && (
                         <div className="p-5 sm:p-6 border-t border-border bg-canvas space-y-5 text-sm">
                           {/* Technical Metadata Matrix */}
-                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 p-3.5 bg-canvas-raised rounded border border-border text-xs">
-                            <div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 bg-canvas-raised rounded border border-border text-xs">
+                            <div className="min-w-0">
                               <span className="text-ink-faint text-[10px] font-mono uppercase block">Affected Target</span>
                               <span className="font-mono text-ink text-xs break-all mt-0.5 block">{finding.affectedComponent || 'Endpoint root'}</span>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <span className="text-ink-faint text-[10px] font-mono uppercase block">Category / Vector</span>
-                              <span className="capitalize text-ink font-medium mt-0.5 block">{finding.category}</span>
+                              <span className="capitalize text-ink font-medium mt-0.5 block break-words">{finding.category}</span>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <span className="text-ink-faint text-[10px] font-mono uppercase block">Confidence / Check</span>
-                              <span className="font-mono text-ink-muted text-xs mt-0.5 block">
+                              <span className="font-mono text-ink-muted text-xs mt-0.5 block break-all">
                                 {finding.confidence || 'Medium'} • {finding.checkId || 'engine-v1'}
                               </span>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <span className="text-ink-faint text-[10px] font-mono uppercase block">Reference / CWE</span>
-                              <span className="font-mono text-accent text-xs mt-0.5 block">
-                                {finding.cweId || finding.referenceScore || 'Standard-Sec'}
-                              </span>
+                              <div className="mt-0.5 space-y-0.5">
+                                {finding.cweId && (
+                                  <span className="font-mono text-accent text-xs font-semibold block">
+                                    {finding.cweId}
+                                  </span>
+                                )}
+                                {finding.referenceScore && finding.referenceScore !== 'N/A' && finding.referenceScore !== finding.cweId && (
+                                  <span
+                                    className={`font-mono block break-all leading-tight ${finding.cweId ? 'text-ink-muted text-[11px]' : 'text-accent text-xs font-medium'}`}
+                                    title={finding.referenceScore}
+                                  >
+                                    {finding.referenceScore}
+                                  </span>
+                                )}
+                                {!finding.cweId && (!finding.referenceScore || finding.referenceScore === 'N/A') && (
+                                  <span className="font-mono text-accent text-xs block">
+                                    Standard-Sec
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
 

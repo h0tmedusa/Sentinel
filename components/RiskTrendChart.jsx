@@ -60,6 +60,8 @@ export default function RiskTrendChart({ historyScans = [] }) {
       <div className="relative py-2">
         <svg
           viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label="Risk score trend sparkline across historical scans"
           className="w-full h-auto overflow-visible select-none"
         >
           {/* Grid lines (0, 25, 50, 75, 100) */}
@@ -112,9 +114,14 @@ export default function RiskTrendChart({ historyScans = [] }) {
               fill={p.score >= 70 ? '#D33B3B' : p.score >= 40 ? '#D97A3D' : '#3E7BFA'}
               stroke="#0B0D10"
               strokeWidth="1.5"
-              className="cursor-pointer transition-all duration-150"
+              tabIndex={0}
+              role="button"
+              aria-label={`Scan #${idx + 1}, Risk Score ${p.score} of 100`}
+              className="cursor-pointer transition-all duration-150 focus:outline-none focus:r-6"
               onMouseEnter={() => setHoveredScan(p)}
               onMouseLeave={() => setHoveredScan(null)}
+              onFocus={() => setHoveredScan(p)}
+              onBlur={() => setHoveredScan(null)}
             />
           ))}
 

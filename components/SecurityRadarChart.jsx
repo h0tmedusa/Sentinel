@@ -61,6 +61,8 @@ export default function SecurityRadarChart({ findings = [] }) {
       <div className="relative flex items-center justify-center py-2">
         <svg
           viewBox={`0 0 ${size} ${size}`}
+          role="img"
+          aria-label="Security radar chart displaying category coverage across 7 vectors"
           className="w-full max-w-[320px] h-auto overflow-visible select-none"
         >
           {/* Background Concentric Rings */}
@@ -112,9 +114,14 @@ export default function SecurityRadarChart({ findings = [] }) {
               fill={p.score > 0 ? '#3E7BFA' : '#5D6069'}
               stroke="#0B0D10"
               strokeWidth="1.5"
-              className="cursor-pointer transition-all duration-150"
+              tabIndex={0}
+              role="button"
+              aria-label={`${p.label}: score ${p.score} of 100, ${p.count} findings`}
+              className="cursor-pointer transition-all duration-150 focus:outline-none"
               onMouseEnter={() => setHoveredVector(p)}
               onMouseLeave={() => setHoveredVector(null)}
+              onFocus={() => setHoveredVector(p)}
+              onBlur={() => setHoveredVector(null)}
             />
           ))}
 

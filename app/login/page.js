@@ -42,7 +42,7 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div className="flex items-start gap-2.5 p-3 rounded bg-canvas-overlay border border-severity-critical/30 text-xs text-severity-critical">
+          <div role="alert" className="flex items-start gap-2.5 p-3 rounded bg-canvas-overlay border border-severity-critical/30 text-xs text-severity-critical">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span className="flex-1 leading-relaxed">{error}</span>
           </div>
@@ -55,9 +55,11 @@ export default function LoginPage() {
             </label>
             <input
               id="username"
+              name="username"
               type="text"
               required
               autoFocus
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g. admin or analyst"
@@ -71,8 +73,10 @@ export default function LoginPage() {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
@@ -83,7 +87,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2 px-4 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-2 px-4 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <>

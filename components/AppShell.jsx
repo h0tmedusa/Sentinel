@@ -34,7 +34,7 @@ export function AppShell({ children }) {
             <button
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open navigation menu"
-              className="p-1.5 rounded text-ink-muted hover:text-ink hover:bg-canvas transition-colors focus-visible:ring-2 focus-visible:ring-accent"
+              className="p-1.5 rounded text-ink-muted hover:text-ink hover:bg-canvas transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Menu className="w-5 h-5" />
             </button>
