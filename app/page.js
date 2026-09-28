@@ -9,19 +9,15 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   Clock,
-  Menu,
 } from 'lucide-react';
 import { SEVERITY_ORDER, SEVERITY_COLORS } from '@/lib/severityTheme';
 import BrandLoader from '@/components/BrandLoader';
-import NavDrawer from '@/components/NavDrawer';
-import { UserBadge } from '@/components/UserBadge';
 import { useScan } from '@/components/ScanProvider';
 import SecurityRadarChart from '@/components/SecurityRadarChart';
 import CategoryDistribution from '@/components/CategoryDistribution';
 
 export default function Home() {
   const [targetUrl, setTargetUrl] = useState('http://localhost:3000');
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [confirmAuthorized, setConfirmAuthorized] = useState(false);
   const [scanError, setScanError] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
@@ -167,31 +163,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas text-ink flex flex-col">
+    <div className="flex-1 flex flex-col">
       <BrandLoader />
-      <NavDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
-      {/* Header */}
-      <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-40">
+      {/* Header Bar */}
+      <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-10 hidden lg:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Open navigation"
-              className="w-8 h-8 flex items-center justify-center rounded text-ink-muted hover:text-ink hover:bg-canvas-raised transition-colors focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-            <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-accent" />
-              <h1 className="text-base font-semibold text-ink tracking-tight">Sentinel</h1>
-            </div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-sm font-semibold text-ink">Dashboard</h1>
+            <span className="text-xs text-ink-faint">• Live Security Assessment</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-xs text-ink-faint hidden sm:flex items-center gap-2">
-              <span>Target Scoped: Localhost / Development Only</span>
-            </div>
-            <UserBadge />
+          <div className="text-xs text-ink-faint flex items-center gap-2">
+            <span>Target Scoped: Localhost / Development Only</span>
           </div>
         </div>
       </header>

@@ -1,17 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Menu } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import RiskTrendChart from '@/components/RiskTrendChart';
-import NavDrawer from '@/components/NavDrawer';
-import { UserBadge } from '@/components/UserBadge';
 import { SEVERITY_TEXT } from '@/lib/severityTheme';
 
 export default function ScanHistoryPage() {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,25 +33,13 @@ export default function ScanHistoryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-canvas text-ink flex flex-col">
-      <NavDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
-
-      <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-40">
+    <div className="flex-1 flex flex-col">
+      <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-10 hidden lg:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Open navigation"
-              className="w-8 h-8 flex items-center justify-center rounded text-ink-muted hover:text-ink hover:bg-canvas-raised transition-colors focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-            <Link href="/" className="text-ink-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent rounded p-1">
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-            <h1 className="text-base font-semibold text-ink">Scan History</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-sm font-semibold text-ink">Scan History</h1>
+            <span className="text-xs text-ink-faint">• Historical Assessment Logs</span>
           </div>
-          <UserBadge />
         </div>
       </header>
 

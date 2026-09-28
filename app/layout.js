@@ -4,6 +4,7 @@ import { ToastProvider } from '@/components/ToastProvider';
 import { AuthProvider } from '@/components/AuthProvider';
 import { RouteGuard } from '@/components/RouteGuard';
 import { ScanProvider } from '@/components/ScanProvider';
+import { AppShell } from '@/components/AppShell';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -19,7 +20,9 @@ export default function RootLayout({ children }) {
         <ScanProvider>
           <AuthProvider>
             <ToastProvider>
-              <RouteGuard>{children}</RouteGuard>
+              <RouteGuard>
+                <AppShell>{children}</AppShell>
+              </RouteGuard>
             </ToastProvider>
           </AuthProvider>
         </ScanProvider>
