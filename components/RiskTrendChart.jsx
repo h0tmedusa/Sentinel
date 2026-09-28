@@ -47,12 +47,12 @@ export default function RiskTrendChart({ historyScans = [] }) {
     : `${pathD} L ${points[points.length - 1].x},${padTop + chartH} L ${points[0].x},${padTop + chartH} Z`;
 
   return (
-    <div className="bg-canvas-raised border border-border rounded-lg p-5 flex flex-col gap-3">
+    <div className="bg-canvas-raised border border-border rounded-xl shadow-subtle p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between pb-2 border-b border-border">
-        <h3 className="text-sm font-medium text-ink">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-ink">
           Risk Score Trend
         </h3>
-        <span className="text-xs text-ink-faint">
+        <span className="text-[11px] font-mono text-ink-faint">
           Last {historyScans.length} Scan{historyScans.length !== 1 ? 's' : ''}
         </span>
       </div>

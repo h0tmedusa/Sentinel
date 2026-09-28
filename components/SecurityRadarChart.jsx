@@ -48,12 +48,12 @@ export default function SecurityRadarChart({ findings = [] }) {
   const polygonPoints = vectorPoints.map((p) => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="bg-canvas-raised border border-border rounded-lg p-5 flex flex-col gap-3">
+    <div className="bg-canvas-raised border border-border rounded-xl shadow-subtle p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between pb-2 border-b border-border">
-        <h3 className="text-sm font-medium text-ink">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-ink">
           Category Coverage Radar
         </h3>
-        <span className="text-xs text-ink-faint">
+        <span className="text-[11px] font-mono text-ink-faint">
           7 Vectors
         </span>
       </div>

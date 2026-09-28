@@ -52,14 +52,14 @@ export default function ScanHistoryPage() {
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
-      <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-10 hidden lg:block">
+      <header className="border-b border-border bg-canvas-raised/80 backdrop-blur-md sticky top-0 z-10 hidden lg:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-ink tracking-tight">Scan History</h1>
-            <span className="text-xs text-ink-faint hidden sm:inline">• Historical Assessment Workspace</span>
+            <span className="text-xs text-ink-faint hidden sm:inline">• Historical Assessment Archive</span>
           </div>
-          <div className="text-xs text-ink-faint">
-            Ledger Entries: <span className="font-mono text-ink font-medium">{scans.length}</span>
+          <div className="text-xs text-ink-faint font-mono">
+            Ledger Records: <span className="text-ink font-medium">{scans.length}</span>
           </div>
         </div>
       </header>
@@ -68,31 +68,31 @@ export default function ScanHistoryPage() {
         {/* Mobile Header Banner (Visible on mobile only) */}
         <div className="lg:hidden flex items-center justify-between gap-2 pb-1">
           <div>
-            <h1 className="text-sm font-semibold text-ink tracking-tight">Scan History</h1>
-            <p className="text-xs text-ink-faint">Historical Assessment Workspace</p>
+            <h1 className="text-base font-semibold text-ink tracking-tight">Scan History</h1>
+            <p className="text-xs text-ink-faint">Historical Assessment Archive</p>
           </div>
-          <span className="text-[11px] font-mono text-ink-faint px-2 py-0.5 rounded bg-canvas-overlay border border-border">
+          <span className="text-[11px] font-mono text-ink-faint px-2 py-0.5 rounded-md bg-canvas-overlay border border-border">
             {scans.length} Entries
           </span>
         </div>
 
         {loading && (
-          <div role="status" aria-live="polite" className="flex items-center gap-2.5 text-xs text-ink-muted p-4 bg-canvas-raised border border-border rounded-lg shadow-subtle">
+          <div role="status" aria-live="polite" className="flex items-center gap-3 text-xs text-ink-muted p-4 bg-canvas-raised border border-border rounded-xl shadow-subtle">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
             <span>Loading historical assessment ledger records...</span>
           </div>
         )}
 
         {error && (
-          <div role="alert" className="p-3 bg-canvas-overlay border border-severity-critical/40 rounded text-xs text-severity-critical flex items-start gap-2.5">
+          <div role="alert" className="p-3.5 bg-canvas-overlay border border-severity-critical/40 rounded-xl text-xs text-severity-critical flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-severity-critical flex-shrink-0 mt-0.5" />
             <span className="leading-relaxed">{error}</span>
           </div>
         )}
 
         {!loading && !error && scans.length === 0 && (
-          <div className="p-12 text-center bg-canvas-raised border border-border rounded-lg shadow-subtle">
-            <div className="w-12 h-12 rounded bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-3.5 text-ink-faint">
+          <div className="p-10 sm:p-12 text-center bg-canvas-raised border border-border rounded-xl shadow-subtle">
+            <div className="w-12 h-12 rounded-lg bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-3.5 text-ink-faint">
               <History className="w-6 h-6" />
             </div>
             <h3 className="text-sm font-semibold text-ink">No Scan History Recorded</h3>
@@ -104,38 +104,40 @@ export default function ScanHistoryPage() {
 
         {!loading && !error && scans.length > 0 && (
           <>
-            {/* Quick Metrics Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="p-3 bg-canvas-raised border border-border rounded flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] text-ink-muted">Total Scans</div>
-                  <div className="text-xl font-semibold text-ink font-mono mt-0.5">{stats.total}</div>
+            {/* Quick Metrics Module (Unified module matching Dashboard and Matrix) */}
+            <div className="bg-canvas-raised border border-border rounded-xl shadow-subtle p-3 sm:p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="p-3 bg-canvas border border-border/80 rounded-lg flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] text-ink-muted font-medium">Total Scans</div>
+                    <div className="text-2xl font-semibold text-ink font-mono mt-0.5">{stats.total}</div>
+                  </div>
+                  <span className="text-[10px] font-mono uppercase text-ink-faint px-1.5 py-0.5 rounded bg-canvas-raised border border-border">RUNS</span>
                 </div>
-                <span className="text-[10px] font-mono uppercase text-ink-faint px-1.5 py-0.5 rounded bg-canvas border border-border">RUNS</span>
-              </div>
 
-              <div className="p-3 bg-canvas-raised border border-border rounded flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] text-ink-muted">Completed (Pass)</div>
-                  <div className="text-xl font-semibold text-severity-low font-mono mt-0.5">{stats.completed}</div>
+                <div className="p-3 bg-canvas border border-border/80 rounded-lg flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] text-ink-muted font-medium">Completed (Pass)</div>
+                    <div className="text-2xl font-semibold text-severity-low font-mono mt-0.5">{stats.completed}</div>
+                  </div>
+                  <span className="w-2 h-2 rounded-full bg-severity-low" />
                 </div>
-                <span className="w-2 h-2 rounded-full bg-severity-low" />
-              </div>
 
-              <div className="p-3 bg-canvas-raised border border-border rounded flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] text-ink-muted">Total Findings</div>
-                  <div className="text-xl font-semibold text-ink font-mono mt-0.5">{stats.totalFindings}</div>
+                <div className="p-3 bg-canvas border border-border/80 rounded-lg flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] text-ink-muted font-medium">Total Findings</div>
+                    <div className="text-2xl font-semibold text-ink font-mono mt-0.5">{stats.totalFindings}</div>
+                  </div>
+                  <span className="text-[10px] font-mono text-ink-faint">LOGGED</span>
                 </div>
-                <span className="text-[10px] font-mono text-ink-faint">LOGGED</span>
-              </div>
 
-              <div className="p-3 bg-canvas-raised border border-border rounded flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] text-ink-muted">Critical Vulns</div>
-                  <div className="text-xl font-semibold text-severity-critical font-mono mt-0.5">{stats.totalCritical}</div>
+                <div className="p-3 bg-canvas border border-border/80 rounded-lg flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] text-ink-muted font-medium">Critical Vulns</div>
+                    <div className="text-2xl font-semibold text-severity-critical font-mono mt-0.5">{stats.totalCritical}</div>
+                  </div>
+                  <span className="w-2 h-2 rounded-full bg-severity-critical" />
                 </div>
-                <span className="w-2 h-2 rounded-full bg-severity-critical" />
               </div>
             </div>
 
@@ -143,7 +145,7 @@ export default function ScanHistoryPage() {
             <RiskTrendChart historyScans={scans} />
 
             {/* Filter and Search Controls */}
-            <div className="p-4 bg-canvas-raised border border-border rounded-lg shadow-subtle space-y-3">
+            <div className="p-4 bg-canvas-raised border border-border rounded-xl shadow-subtle space-y-3">
               <div className="flex flex-col sm:flex-row gap-2.5">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint" />
@@ -153,14 +155,14 @@ export default function ScanHistoryPage() {
                     onChange={(e) => setSearch(e.target.value)}
                     aria-label="Search by target endpoint URL"
                     placeholder="Search by target endpoint URL..."
-                    className="w-full h-9 pl-9 pr-4 bg-canvas border border-border rounded text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="w-full h-10 pl-9 pr-4 bg-canvas border border-border rounded-md text-xs text-ink placeholder-ink-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   aria-label="Filter scans by execution status"
-                  className="h-9 text-xs bg-canvas border border-border rounded px-3 text-ink focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="h-10 text-xs bg-canvas border border-border rounded-md px-3 text-ink focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
                 >
                   <option value="all">All Execution Statuses</option>
                   <option value="done">Completed (Done)</option>
@@ -181,11 +183,11 @@ export default function ScanHistoryPage() {
               </div>
             </div>
 
-            {/* Assessment Execution Ledger Table */}
-            <div className="bg-canvas-raised border border-border rounded-lg overflow-hidden shadow-subtle">
-              <div className="px-4 py-3 border-b border-border bg-canvas-overlay/40 flex items-center justify-between">
+            {/* Assessment Execution Ledger Table (Dense professional archive table) */}
+            <div className="bg-canvas-raised border border-border rounded-xl overflow-hidden shadow-subtle">
+              <div className="px-5 py-3 border-b border-border bg-canvas-overlay/40 flex items-center justify-between">
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Assessment Execution Ledger</h2>
-                <span className="text-[11px] font-mono text-ink-faint">Click icon to inspect in matrix</span>
+                <span className="text-[11px] font-mono text-ink-faint">Direct matrix inspection</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs min-w-[680px]">
@@ -246,7 +248,7 @@ export default function ScanHistoryPage() {
                         <td className="px-4 py-3 text-center whitespace-nowrap">
                           <Link
                             href={`/vulnerability-matrix?scanId=${s.id}`}
-                            className="inline-flex items-center gap-1 text-xs text-accent hover:text-accent-hover font-medium px-2 py-1 rounded border border-accent/20 hover:border-accent/40 bg-accent-muted/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                            className="inline-flex items-center gap-1 text-xs text-accent hover:text-accent-hover font-medium px-2.5 py-1 rounded-md border border-accent/25 hover:border-accent/40 bg-accent-muted/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                             title="Open scan in Vulnerability Matrix"
                             aria-label={`Inspect scan for ${s.targetUrl}`}
                           >

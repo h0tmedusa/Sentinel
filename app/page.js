@@ -175,10 +175,10 @@ export default function Home() {
     <div className="flex-1 flex flex-col min-w-0">
       <BrandLoader />
 
-      {/* 1. Header Bar: Compact SOC status header */}
-      <header className="border-b border-border bg-canvas-raised/80 sticky top-0 z-10 hidden lg:block">
+      {/* 1. Header Bar: Refined Enterprise SOC Status Header */}
+      <header className="border-b border-border bg-canvas-raised/80 backdrop-blur-md sticky top-0 z-10 hidden lg:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-sm font-semibold text-ink tracking-tight">Security Dashboard</h1>
             <span className="text-xs text-ink-faint hidden sm:inline">• Automated Assessment &amp; Validation</span>
           </div>
@@ -186,23 +186,23 @@ export default function Home() {
           <div className="flex items-center gap-3 text-xs flex-shrink-0">
             {/* Live Scan Status Pill */}
             {loading ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-accent-muted border border-accent/30 text-accent font-medium font-mono text-[11px]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-accent-muted border border-accent/30 text-accent font-medium font-mono text-[11px]">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 {scanStatus === 'initializing' ? 'INITIALIZING ENGINE' : 'SCAN IN PROGRESS'}
               </span>
             ) : scanData ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-canvas-overlay border border-border text-ink-muted text-[11px] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-severity-low" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-canvas-overlay border border-border text-ink-muted text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 ASSESSMENT LOADED ({findings.length} findings)
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-canvas-overlay border border-border text-ink-faint text-[11px] font-mono">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-canvas-overlay border border-border text-ink-faint text-[11px] font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-ink-faint" />
-                READY FOR SCAN
+                READY FOR ASSESSMENT
               </span>
             )}
             <span className="text-border hidden sm:inline">|</span>
-            <span className="text-ink-faint hidden sm:inline">Target Scope: Localhost / Dev Only</span>
+            <span className="text-ink-faint hidden sm:inline font-mono text-[11px]">Scope: Localhost / Dev Only</span>
           </div>
         </div>
       </header>
@@ -213,7 +213,7 @@ export default function Home() {
         {/* Mobile Header Banner (Visible on mobile only) */}
         <div className="lg:hidden flex flex-col gap-1 pb-1">
           <div className="flex items-center justify-between gap-2">
-            <h1 className="text-sm font-semibold text-ink tracking-tight">Security Dashboard</h1>
+            <h1 className="text-base font-semibold text-ink tracking-tight">Security Dashboard</h1>
             {loading ? (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-accent-muted border border-accent/30 text-accent font-medium font-mono text-[10px]">
                 <Loader2 className="w-3 h-3 animate-spin" />
@@ -221,7 +221,7 @@ export default function Home() {
               </span>
             ) : scanData ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-canvas-overlay border border-border text-ink-muted text-[10px] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-severity-low" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 {findings.length} FINDINGS
               </span>
             ) : (
@@ -233,15 +233,15 @@ export default function Home() {
           <p className="text-xs text-ink-faint">Automated Assessment &amp; Validation • Dev Scope</p>
         </div>
 
-        {/* 2. Primary Scan Configuration Section */}
-        <section aria-label="Scan Configuration" className="bg-canvas-raised border border-border rounded-lg shadow-subtle overflow-hidden">
+        {/* LEVEL 1: Primary Action — Scan Configuration Console */}
+        <section aria-label="Scan Configuration" className="bg-canvas-raised border border-border rounded-xl shadow-raised overflow-hidden">
           {/* Section Header */}
-          <div className="px-5 py-3.5 border-b border-border bg-canvas-overlay/40 flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="px-5 py-3 border-b border-border bg-canvas-overlay/50 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
               <Shield className="w-4 h-4 text-accent" />
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Target Assessment Configuration</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Target Assessment Console</h2>
             </div>
-            <span className="text-[11px] font-mono text-ink-faint">Automated Checks (11 Vectors)</span>
+            <span className="text-[11px] font-mono text-ink-faint">11 Audit Vectors</span>
           </div>
 
           <div className="p-5 sm:p-6">
@@ -261,7 +261,7 @@ export default function Home() {
                       required
                       disabled={loading}
                       placeholder="http://localhost:3000"
-                      className="w-full h-10 px-3.5 bg-canvas border border-border rounded text-ink placeholder-ink-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono text-sm transition-colors disabled:opacity-60"
+                      className="w-full h-10 px-3.5 bg-canvas border border-border rounded-md text-ink placeholder-ink-faint focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono text-sm transition-colors disabled:opacity-60"
                     />
                   </div>
 
@@ -271,10 +271,10 @@ export default function Home() {
                       onClick={() => setShowAuth(!showAuth)}
                       aria-expanded={showAuth}
                       aria-controls="credentials-panel"
-                      className={`h-10 px-3.5 rounded border text-xs font-medium transition-colors flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                      className={`h-10 px-3.5 rounded-md border text-xs font-medium transition-colors flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                         showAuth 
                           ? 'bg-canvas-overlay border-border text-ink' 
-                          : 'bg-canvas-raised border-border text-ink-muted hover:text-ink hover:bg-canvas-overlay'
+                          : 'bg-canvas border-border text-ink-muted hover:text-ink hover:bg-canvas-overlay'
                       }`}
                     >
                       <KeyRound className="w-3.5 h-3.5 text-ink-muted" />
@@ -286,7 +286,7 @@ export default function Home() {
                       type="submit"
                       disabled={loading || !confirmAuthorized}
                       title={!confirmAuthorized ? 'Please confirm authorization below to start scan' : 'Start Security Scan'}
-                      className="h-10 px-5 bg-accent hover:bg-accent-hover active:bg-accent disabled:bg-canvas-raised disabled:text-ink-faint disabled:border disabled:border-border disabled:cursor-not-allowed text-white font-medium text-xs rounded transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-subtle min-w-[120px]"
+                      className="h-10 px-5 bg-accent hover:bg-accent-hover active:bg-accent disabled:bg-canvas-raised disabled:text-ink-faint disabled:border disabled:border-border disabled:cursor-not-allowed text-white font-medium text-xs rounded-md transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-sm min-w-[124px]"
                     >
                       {loading ? (
                         <>
@@ -304,11 +304,11 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Distinct Authorization Confirmation Box */}
-              <div className={`p-3.5 rounded border transition-colors ${
+              {/* Distinct Authorization Confirmation Control */}
+              <div className={`p-3.5 rounded-md border transition-all ${
                 confirmAuthorized 
-                  ? 'bg-canvas-overlay/70 border-accent/40' 
-                  : 'bg-canvas-overlay/30 border-border hover:border-ink-faint'
+                  ? 'bg-canvas-overlay/70 border-accent/40 shadow-sm' 
+                  : 'bg-canvas/50 border-border hover:border-ink-faint/60'
               }`}>
                 <label htmlFor="confirm-authorization-checkbox" className="flex items-start gap-3 cursor-pointer select-none">
                   <input
@@ -320,11 +320,10 @@ export default function Home() {
                     className="mt-0.5 w-4 h-4 rounded border-border bg-canvas text-accent focus:ring-accent focus:ring-offset-canvas cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   />
                   <div className="flex-1 text-xs">
-                    <span className="font-medium text-ink block sm:inline">Legal Authorization Confirmation: </span>
+                    <span className="font-semibold text-ink block sm:inline">Legal Assessment Authorization: </span>
                     <span className="text-ink-muted leading-relaxed">
-                      I confirm I am authorized to execute automated security tests against this target
-                      (owned target, staging deployment, or explicit written penetration testing agreement).
-                      Unauthorized scanning is prohibited.
+                      I verify authorization to execute automated security assessment checks against this endpoint
+                      (local instance, staging environment, or authorized target scope).
                     </span>
                   </div>
                 </label>
@@ -341,7 +340,7 @@ export default function Home() {
                     Provide the resource owner target under User A, and an attacker or alternate tenant credentials under User B. The engine will verify object isolation.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    <div className="p-3.5 bg-canvas border border-border rounded space-y-2.5">
+                    <div className="p-3.5 bg-canvas border border-border rounded-md space-y-2.5">
                       <div className="text-xs font-semibold text-ink flex items-center justify-between">
                         <span>User A (Resource Owner)</span>
                         <span className="text-[10px] font-mono text-ink-faint">Account Owner</span>
@@ -368,7 +367,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="p-3.5 bg-canvas border border-border rounded space-y-2.5">
+                    <div className="p-3.5 bg-canvas border border-border rounded-md space-y-2.5">
                       <div className="text-xs font-semibold text-ink flex items-center justify-between">
                         <span>User B (Cross-Account Attacker)</span>
                         <span className="text-[10px] font-mono text-ink-faint">Testing Persona</span>
@@ -401,7 +400,7 @@ export default function Home() {
 
             {/* Error Message Display */}
             {scanError && (
-              <div role="alert" className="mt-4 flex items-start gap-3 p-3 bg-canvas-overlay border border-severity-critical/40 rounded text-xs">
+              <div role="alert" className="mt-4 flex items-start gap-3 p-3 bg-canvas-overlay border border-severity-critical/40 rounded-md text-xs animate-fadeIn">
                 <AlertTriangle className="w-4 h-4 text-severity-critical flex-shrink-0 mt-0.5" />
                 <div className="flex-1 text-severity-critical leading-relaxed">{scanError}</div>
                 <button
@@ -416,42 +415,42 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 3. Running State Banner (While scan is in flight) */}
+        {/* Running State Banner (While scan is in flight) */}
         {loading && (
-          <section aria-label="Scan in Progress" className="bg-canvas-raised border border-accent/30 rounded-lg p-5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded bg-accent-muted border border-accent/20 flex items-center justify-center flex-shrink-0">
+          <section aria-label="Scan in Progress" className="bg-canvas-raised border border-accent/40 rounded-xl p-5 flex items-center gap-4 shadow-subtle animate-pulse">
+            <div className="w-10 h-10 rounded-lg bg-accent-muted border border-accent/30 flex items-center justify-center flex-shrink-0">
               <Loader2 className="w-5 h-5 text-accent animate-spin" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-ink font-mono">
-                  {scanStatus === 'initializing' ? 'INITIALIZING SECURITY SCANNER' : 'EXECUTING AUTOMATED CHECKS'}
+                  {scanStatus === 'initializing' ? 'INITIALIZING ENGINE VECTORS' : 'EXECUTING AUTOMATED AUDIT'}
                 </h3>
                 <span className="text-[11px] text-ink-faint">• Target: <span className="font-mono text-ink-muted">{targetUrl}</span></span>
               </div>
               <p className="text-xs text-ink-muted mt-0.5">
-                Probing headers, access controls, token security, and injection vectors. Results will display below upon completion.
+                Probing security response headers, access boundaries, authentication tokens, and injection vectors.
               </p>
             </div>
           </section>
         )}
 
-        {/* 4. Empty State (When no scan has been executed yet) */}
+        {/* Empty State (When no scan has been executed yet) */}
         {!loading && !scanData && (
-          <section aria-label="No Assessment" className="bg-canvas-raised border border-border rounded-lg p-10 text-center">
-            <div className="w-12 h-12 rounded bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-3.5 text-ink-faint">
+          <section aria-label="No Assessment" className="bg-canvas-raised border border-border rounded-xl p-10 sm:p-12 text-center">
+            <div className="w-12 h-12 rounded-lg bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-3.5 text-ink-faint">
               <FileSearch className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-semibold text-ink">No Security Assessment Loaded</h3>
+            <h3 className="text-sm font-semibold text-ink">Ready for Assessment</h3>
             <p className="text-xs text-ink-muted mt-1 max-w-md mx-auto leading-relaxed">
-              Verify your target endpoint above, confirm testing authorization, and select <strong className="text-ink font-medium">Start Scan</strong> to run compliance checks and triage findings.
+              Configure a target endpoint URL above, confirm authorization, and click <strong className="text-ink font-medium">Start Scan</strong> to begin automated security testing.
             </p>
           </section>
         )}
 
-        {/* 5. Security Metrics & Visualizations (When scan data is present) */}
+        {/* LEVEL 2: Security State — Metrics Summary Module & Integrated Charts */}
         {scanData && (
-          <section aria-label="Security Metrics Summary" className="space-y-5">
+          <section aria-label="Security Metrics Summary" className="space-y-4">
             {/* Section Header & Scan Metadata */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
               <div>
@@ -459,7 +458,7 @@ export default function Home() {
                   <span className="w-2 h-2 rounded-full bg-accent" />
                   <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Assessment Security Summary</h2>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-ink-faint mt-1">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-ink-faint mt-1">
                   <Clock className="w-3.5 h-3.5" />
                   <span>Duration: {scanData.scan.finishedAt ? Math.round((new Date(scanData.scan.finishedAt) - new Date(scanData.scan.startedAt)) / 1000) : 0}s</span>
                   <span>•</span>
@@ -474,120 +473,122 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Unified Security Metrics Summary Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-              {/* Total Findings (Overall Security Picture) */}
-              <button 
-                type="button"
-                onClick={() => setFilterSeverity('all')}
-                aria-pressed={filterSeverity === 'all'}
-                aria-label={`Show all ${stats.total} findings`}
-                className={`col-span-2 sm:col-span-1 p-3.5 rounded border text-left transition-all relative overflow-hidden flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  filterSeverity === 'all'
-                    ? 'bg-canvas-overlay border-accent shadow-subtle ring-1 ring-accent'
-                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-ink-faint'
-                }`}
-              >
-                <div className="flex items-center justify-between text-ink-muted text-xs">
-                  <span className="font-medium">Total Findings</span>
-                  <span className="text-[10px] font-mono uppercase text-ink-faint">All</span>
-                </div>
-                <div className="mt-2.5 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-ink tracking-tight font-mono">{stats.total}</span>
-                  <span className="text-[11px] text-ink-faint">detected</span>
-                </div>
-              </button>
+            {/* Unified Security Summary Module (Single bordered container) */}
+            <div className="bg-canvas-raised border border-border rounded-xl shadow-subtle p-3 sm:p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                {/* Total Findings */}
+                <button 
+                  type="button"
+                  onClick={() => setFilterSeverity('all')}
+                  aria-pressed={filterSeverity === 'all'}
+                  aria-label={`Show all ${stats.total} findings`}
+                  className={`col-span-2 sm:col-span-1 p-3 rounded-lg border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    filterSeverity === 'all'
+                      ? 'bg-canvas-overlay border-accent shadow-sm ring-1 ring-accent'
+                      : 'bg-canvas border-border/80 hover:bg-canvas-overlay hover:border-ink-faint/60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-ink-muted text-xs">
+                    <span className="font-medium">Total Findings</span>
+                    <span className="text-[10px] font-mono uppercase text-ink-faint">All</span>
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-semibold text-ink tracking-tight font-mono">{stats.total}</span>
+                    <span className="text-[11px] text-ink-faint">detected</span>
+                  </div>
+                </button>
 
-              {/* Critical */}
-              <button 
-                type="button"
-                onClick={() => setFilterSeverity('critical')}
-                aria-pressed={filterSeverity === 'critical'}
-                aria-label={`Filter by critical severity, ${stats.critical} findings`}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  filterSeverity === 'critical'
-                    ? 'bg-severity-critical/15 border-severity-critical ring-1 ring-severity-critical'
-                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-critical/40'
-                }`}
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-ink-muted">Critical</span>
-                  <span className="w-2 h-2 rounded-full bg-severity-critical flex-shrink-0" />
-                </div>
-                <div className="mt-2.5 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-severity-critical tracking-tight font-mono">{stats.critical}</span>
-                  <span className="text-[11px] text-ink-faint">high-risk</span>
-                </div>
-              </button>
+                {/* Critical */}
+                <button 
+                  type="button"
+                  onClick={() => setFilterSeverity('critical')}
+                  aria-pressed={filterSeverity === 'critical'}
+                  aria-label={`Filter by critical severity, ${stats.critical} findings`}
+                  className={`p-3 rounded-lg border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    filterSeverity === 'critical'
+                      ? 'bg-severity-critical/15 border-severity-critical ring-1 ring-severity-critical'
+                      : 'bg-canvas border-border/80 hover:bg-canvas-overlay hover:border-severity-critical/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-ink-muted">Critical</span>
+                    <span className="w-2 h-2 rounded-full bg-severity-critical flex-shrink-0" />
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-semibold text-severity-critical tracking-tight font-mono">{stats.critical}</span>
+                    <span className="text-[11px] text-ink-faint">high-risk</span>
+                  </div>
+                </button>
 
-              {/* High */}
-              <button 
-                type="button"
-                onClick={() => setFilterSeverity('high')}
-                aria-pressed={filterSeverity === 'high'}
-                aria-label={`Filter by high severity, ${stats.high} findings`}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  filterSeverity === 'high'
-                    ? 'bg-severity-high/15 border-severity-high ring-1 ring-severity-high'
-                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-high/40'
-                }`}
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-ink-muted">High</span>
-                  <span className="w-2 h-2 rounded-full bg-severity-high flex-shrink-0" />
-                </div>
-                <div className="mt-2.5 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-severity-high tracking-tight font-mono">{stats.high}</span>
-                  <span className="text-[11px] text-ink-faint">urgent</span>
-                </div>
-              </button>
+                {/* High */}
+                <button 
+                  type="button"
+                  onClick={() => setFilterSeverity('high')}
+                  aria-pressed={filterSeverity === 'high'}
+                  aria-label={`Filter by high severity, ${stats.high} findings`}
+                  className={`p-3 rounded-lg border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    filterSeverity === 'high'
+                      ? 'bg-severity-high/15 border-severity-high ring-1 ring-severity-high'
+                      : 'bg-canvas border-border/80 hover:bg-canvas-overlay hover:border-severity-high/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-ink-muted">High</span>
+                    <span className="w-2 h-2 rounded-full bg-severity-high flex-shrink-0" />
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-semibold text-severity-high tracking-tight font-mono">{stats.high}</span>
+                    <span className="text-[11px] text-ink-faint">urgent</span>
+                  </div>
+                </button>
 
-              {/* Medium */}
-              <button 
-                type="button"
-                onClick={() => setFilterSeverity('medium')}
-                aria-pressed={filterSeverity === 'medium'}
-                aria-label={`Filter by medium severity, ${stats.medium} findings`}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  filterSeverity === 'medium'
-                    ? 'bg-severity-medium/15 border-severity-medium ring-1 ring-severity-medium'
-                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-medium/40'
-                }`}
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-ink-muted">Medium</span>
-                  <span className="w-2 h-2 rounded-full bg-severity-medium flex-shrink-0" />
-                </div>
-                <div className="mt-2.5 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-severity-medium tracking-tight font-mono">{stats.medium}</span>
-                  <span className="text-[11px] text-ink-faint">moderate</span>
-                </div>
-              </button>
+                {/* Medium */}
+                <button 
+                  type="button"
+                  onClick={() => setFilterSeverity('medium')}
+                  aria-pressed={filterSeverity === 'medium'}
+                  aria-label={`Filter by medium severity, ${stats.medium} findings`}
+                  className={`p-3 rounded-lg border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    filterSeverity === 'medium'
+                      ? 'bg-severity-medium/15 border-severity-medium ring-1 ring-severity-medium'
+                      : 'bg-canvas border-border/80 hover:bg-canvas-overlay hover:border-severity-medium/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-ink-muted">Medium</span>
+                    <span className="w-2 h-2 rounded-full bg-severity-medium flex-shrink-0" />
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-semibold text-severity-medium tracking-tight font-mono">{stats.medium}</span>
+                    <span className="text-[11px] text-ink-faint">moderate</span>
+                  </div>
+                </button>
 
-              {/* Low */}
-              <button 
-                type="button"
-                onClick={() => setFilterSeverity('low')}
-                aria-pressed={filterSeverity === 'low'}
-                aria-label={`Filter by low severity, ${stats.low} findings`}
-                className={`p-3.5 rounded border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  filterSeverity === 'low'
-                    ? 'bg-severity-low/15 border-severity-low ring-1 ring-severity-low'
-                    : 'bg-canvas-raised border-border hover:bg-canvas-overlay hover:border-severity-low/40'
-                }`}
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-ink-muted">Low</span>
-                  <span className="w-2 h-2 rounded-full bg-severity-low flex-shrink-0" />
-                </div>
-                <div className="mt-2.5 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-severity-low tracking-tight font-mono">{stats.low}</span>
-                  <span className="text-[11px] text-ink-faint">informational</span>
-                </div>
-              </button>
+                {/* Low */}
+                <button 
+                  type="button"
+                  onClick={() => setFilterSeverity('low')}
+                  aria-pressed={filterSeverity === 'low'}
+                  aria-label={`Filter by low severity, ${stats.low} findings`}
+                  className={`p-3 rounded-lg border text-left transition-all relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    filterSeverity === 'low'
+                      ? 'bg-severity-low/15 border-severity-low ring-1 ring-severity-low'
+                      : 'bg-canvas border-border/80 hover:bg-canvas-overlay hover:border-severity-low/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-ink-muted">Low</span>
+                    <span className="w-2 h-2 rounded-full bg-severity-low flex-shrink-0" />
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-semibold text-severity-low tracking-tight font-mono">{stats.low}</span>
+                    <span className="text-[11px] text-ink-faint">informational</span>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* Coverage Radar & CWE Distribution */}
+            {/* Integrated Visualizations (Radar & CWE Distribution) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <SecurityRadarChart findings={findings} />
               <CategoryDistribution findings={findings} />
@@ -595,13 +596,13 @@ export default function Home() {
           </section>
         )}
 
-        {/* 6. Detailed Findings Container */}
+        {/* LEVEL 3: Detail — Structured Security Findings */}
         {scanData && (
           <section aria-label="Detailed Findings" className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">
-                  Security Findings List ({sortedFindings.length})
+                  Security Findings ({sortedFindings.length})
                 </h2>
                 {filterSeverity !== 'all' && (
                   <span className="text-[11px] font-mono text-accent">
@@ -621,7 +622,7 @@ export default function Home() {
 
             {/* Zero Findings State for Completed Scan vs Filtered Out */}
             {findings.length === 0 ? (
-              <div className="p-12 text-center bg-canvas-raised border border-border rounded-lg shadow-subtle">
+              <div className="p-12 text-center bg-canvas-raised border border-border rounded-xl shadow-subtle">
                 <CheckCircle2 className="w-10 h-10 text-severity-low mx-auto mb-3 opacity-90" />
                 <h3 className="text-sm font-semibold text-ink">No Vulnerabilities Detected</h3>
                 <p className="text-xs text-ink-muted mt-1 max-w-md mx-auto leading-relaxed">
@@ -629,8 +630,8 @@ export default function Home() {
                 </p>
               </div>
             ) : sortedFindings.length === 0 ? (
-              <div className="p-10 text-center bg-canvas-raised border border-border rounded-lg shadow-subtle">
-                <div className="w-8 h-8 rounded bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-2.5 text-ink-faint">
+              <div className="p-10 text-center bg-canvas-raised border border-border rounded-xl shadow-subtle">
+                <div className="w-8 h-8 rounded-lg bg-canvas-overlay border border-border flex items-center justify-center mx-auto mb-2.5 text-ink-faint">
                   <CheckCircle2 className="w-4 h-4 text-severity-low" />
                 </div>
                 <h3 className="text-sm font-semibold text-ink">No Findings for Current Severity</h3>
@@ -645,12 +646,12 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border bg-canvas-raised shadow-subtle">
+              <div className="border border-border rounded-xl overflow-hidden divide-y divide-border bg-canvas-raised shadow-subtle">
                 {sortedFindings.map((finding) => {
                   const isExpanded = !!expandedRows[finding.id];
                   return (
                     <div key={finding.id} className="transition-colors">
-                      {/* Professional Collapsible Findings Row Header */}
+                      {/* Findings Row Header */}
                       <div
                         role="button"
                         tabIndex={0}
@@ -664,7 +665,7 @@ export default function Home() {
                           }
                         }}
                         className={`p-3.5 sm:p-4 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 select-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                          isExpanded ? 'bg-canvas-overlay/70' : 'hover:bg-canvas-overlay/50'
+                          isExpanded ? 'bg-canvas-overlay/70' : 'hover:bg-canvas-overlay/40'
                         }`}
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -721,11 +722,11 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Professional Expanded Findings Detail View */}
+                      {/* Expanded Findings Detail View */}
                       {isExpanded && (
                         <div className="p-5 sm:p-6 border-t border-border bg-canvas space-y-5 text-sm">
                           {/* Technical Metadata Matrix */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 bg-canvas-raised rounded border border-border text-xs">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 bg-canvas-raised rounded-lg border border-border text-xs">
                             <div className="min-w-0">
                               <span className="text-ink-faint text-[10px] font-mono uppercase block">Affected Target</span>
                               <span className="font-mono text-ink text-xs break-all mt-0.5 block">{finding.affectedComponent || 'Endpoint root'}</span>
@@ -784,7 +785,7 @@ export default function Home() {
                                   Verification / Reproduction Steps
                                 </h4>
                               </div>
-                              <pre className="p-3.5 bg-canvas-raised border border-border rounded text-xs font-mono text-ink-muted whitespace-pre-wrap leading-relaxed overflow-x-auto">
+                              <pre className="p-3.5 bg-canvas-raised border border-border rounded-lg text-xs font-mono text-ink-muted whitespace-pre-wrap leading-relaxed overflow-x-auto">
                                 {finding.stepsToReproduce}
                               </pre>
                             </div>
@@ -799,7 +800,7 @@ export default function Home() {
                                   Captured HTTP Evidence
                                 </h4>
                               </div>
-                              <pre className="p-3.5 bg-canvas-raised border border-border rounded text-xs font-mono text-ink-muted overflow-x-auto max-h-72 overflow-y-auto leading-relaxed border-l-2 border-l-accent">
+                              <pre className="p-3.5 bg-canvas-raised border border-border rounded-lg text-xs font-mono text-ink-muted overflow-x-auto max-h-72 overflow-y-auto leading-relaxed border-l-2 border-l-accent">
                                 {typeof finding.evidence === 'object'
                                   ? JSON.stringify(finding.evidence, null, 2)
                                   : finding.evidence}
@@ -809,7 +810,7 @@ export default function Home() {
 
                           {/* Operational Impact & Remediation Guidance */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="p-4 bg-canvas-raised border border-border rounded space-y-1.5">
+                            <div className="p-4 bg-canvas-raised border border-border rounded-lg space-y-1.5">
                               <h5 className="text-xs font-semibold uppercase tracking-wider text-severity-high font-mono flex items-center gap-1.5">
                                 <AlertTriangle className="w-3.5 h-3.5 text-severity-high" />
                                 Operational / Business Risk
@@ -819,7 +820,7 @@ export default function Home() {
                               </p>
                             </div>
 
-                            <div className="p-4 bg-canvas-raised border border-border rounded space-y-1.5">
+                            <div className="p-4 bg-canvas-raised border border-border rounded-lg space-y-1.5">
                               <h5 className="text-xs font-semibold uppercase tracking-wider text-severity-low font-mono flex items-center gap-1.5">
                                 <Shield className="w-3.5 h-3.5 text-severity-low" />
                                 Remediation Recommendation

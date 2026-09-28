@@ -27,16 +27,17 @@ export default function CategoryDistribution({ findings = [] }) {
 
   if (distribution.length === 0) {
     return (
-      <div className="bg-canvas-raised border border-border rounded-lg p-5 flex items-center justify-center min-h-[120px]">
+      <div className="bg-canvas-raised border border-border rounded-xl p-5 flex items-center justify-center min-h-[120px]">
         <span className="text-xs text-ink-faint">No CWE-classified findings in this scan</span>
       </div>
     );
   }
 
   return (
-    <div className="bg-canvas-raised border border-border rounded-lg p-5 flex flex-col gap-3">
+    <div className="bg-canvas-raised border border-border rounded-xl shadow-subtle p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between pb-2 border-b border-border">
-        <h3 className="text-sm font-medium text-ink">CWE Distribution</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-ink">CWE Distribution</h3>
+        <span className="text-[11px] font-mono text-ink-faint">{distribution.length} Classes</span>
       </div>
       <div className="flex flex-col gap-2.5">
         {distribution.map((item) => (

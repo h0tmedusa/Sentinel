@@ -74,15 +74,15 @@ ${finding.remediation || '// Apply security policy and input validation as speci
       />
 
       {/* Modal Dialog */}
-      <div className="relative z-10 w-full max-w-4xl max-h-[90vh] bg-canvas-raised border border-border rounded-lg shadow-raised flex flex-col overflow-hidden">
+      <div className="relative z-10 w-full max-w-4xl max-h-[90vh] bg-canvas-raised border border-border rounded-xl shadow-overlay flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3 min-w-0">
-            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${SEVERITY_BADGE[finding.severity] || 'bg-canvas-overlay text-ink'}`}>
+            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${SEVERITY_BADGE[finding.severity] || 'bg-canvas-overlay text-ink border-border'}`}>
               {finding.severity}
             </span>
             {finding.cweId && (
-              <span className="text-xs font-mono text-ink-muted">
+              <span className="text-xs font-mono text-ink-muted px-1.5 py-0.5 rounded bg-canvas border border-border">
                 {finding.cweId}
               </span>
             )}
@@ -93,7 +93,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1 rounded text-ink-muted hover:text-ink hover:bg-canvas-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="p-1 rounded-md text-ink-muted hover:text-ink hover:bg-canvas-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <X className="w-5 h-5" />
           </button>
@@ -134,7 +134,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                   <button
                     key={fw}
                     onClick={() => setSelectedFramework(fw)}
-                    className={`px-2 py-1 rounded text-xs capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    className={`px-2.5 py-1 rounded-md text-xs capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                       currentFramework === fw
                         ? 'bg-accent-muted text-accent border border-accent/40 font-medium'
                         : 'bg-canvas-overlay text-ink-muted hover:text-ink border border-border'
@@ -160,14 +160,14 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => copyToClipboard(diffContent)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-accent" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Copied' : 'Copy Diff'}
                   </button>
                   <button
                     onClick={downloadDiff}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-canvas-overlay hover:bg-border text-ink border border-border transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Download
@@ -178,7 +178,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
               {/* Side by Side Diff Display */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono">
                 {/* Vulnerable State */}
-                <div className="flex flex-col rounded border border-severity-critical/30 bg-severity-critical/5 overflow-hidden">
+                <div className="flex flex-col rounded-lg border border-severity-critical/30 bg-severity-critical/5 overflow-hidden">
                   <div className="px-3 py-2 border-b border-severity-critical/20 flex items-center gap-1.5 text-severity-critical">
                     <ShieldAlert className="w-3.5 h-3.5" />
                     <span className="font-semibold text-[11px]">Current / Vulnerable</span>
@@ -189,7 +189,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                 </div>
 
                 {/* Hardened Implementation */}
-                <div className="flex flex-col rounded border border-border bg-canvas-overlay overflow-hidden">
+                <div className="flex flex-col rounded-lg border border-border bg-canvas-overlay overflow-hidden">
                   <div className="px-3 py-2 border-b border-border flex items-center justify-between text-ink">
                     <div className="flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-accent" />
@@ -197,7 +197,7 @@ ${finding.remediation || '// Apply security policy and input validation as speci
                     </div>
                     <button
                       onClick={() => copyToClipboard(secureCode)}
-                      className="text-[11px] text-accent hover:text-accent-hover flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="text-[11px] text-accent hover:text-accent-hover flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
                     >
                       <Copy className="w-3 h-3" />
                       Copy Code
@@ -213,19 +213,19 @@ ${finding.remediation || '// Apply security policy and input validation as speci
             /* Frameworks Tab */
             <div className="space-y-4">
               {frameworks.length === 0 ? (
-                <div className="p-8 text-center text-ink-muted border border-border rounded">
+                <div className="p-8 text-center text-ink-muted border border-border rounded-lg">
                   No framework-specific templates defined for this check. Follow the generic remediation policy.
                 </div>
               ) : (
                 frameworks.map((fw) => (
-                  <div key={fw} className="border border-border rounded overflow-hidden bg-canvas-overlay">
+                  <div key={fw} className="border border-border rounded-lg overflow-hidden bg-canvas-overlay">
                     <div className="px-4 py-2 bg-canvas-raised border-b border-border flex items-center justify-between">
                       <span className="font-medium text-ink text-xs capitalize">
                         {fw} Implementation
                       </span>
                       <button
                         onClick={() => copyToClipboard(patchSnippets[fw])}
-                        className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
                       >
                         <Copy className="w-3 h-3" />
                         Copy Snippet
@@ -241,26 +241,26 @@ ${finding.remediation || '// Apply security policy and input validation as speci
           )}
 
           {/* Compliance & Standards */}
-          <div className="p-4 rounded border border-border bg-canvas-overlay flex flex-col gap-2">
-            <h4 className="text-xs font-semibold text-ink">
+          <div className="p-4 rounded-lg border border-border bg-canvas-overlay flex flex-col gap-2">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-ink">
               Compliance &amp; Mapping Standards
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 rounded bg-canvas border border-border min-w-0">
-                <span className="text-[10px] text-ink-faint block">OWASP Category</span>
-                <span className="text-ink font-medium break-words">{finding.owaspCategory || 'N/A'}</span>
+              <div className="p-2.5 rounded-md bg-canvas border border-border min-w-0">
+                <span className="text-[10px] font-mono text-ink-faint block uppercase">OWASP Category</span>
+                <span className="text-ink font-medium break-words text-xs mt-0.5 block">{finding.owaspCategory || 'N/A'}</span>
               </div>
-              <div className="p-2 rounded bg-canvas border border-border min-w-0">
-                <span className="text-[10px] text-ink-faint block">MITRE Technique</span>
-                <span className="text-ink font-medium break-words">{finding.mitreTechnique || 'N/A'}</span>
+              <div className="p-2.5 rounded-md bg-canvas border border-border min-w-0">
+                <span className="text-[10px] font-mono text-ink-faint block uppercase">MITRE Technique</span>
+                <span className="text-ink font-medium break-words text-xs mt-0.5 block">{finding.mitreTechnique || 'N/A'}</span>
               </div>
-              <div className="p-2 rounded bg-canvas border border-border min-w-0">
-                <span className="text-[10px] text-ink-faint block">NIST Control</span>
-                <span className="text-ink font-medium break-words">{finding.nistMapping || 'N/A'}</span>
+              <div className="p-2.5 rounded-md bg-canvas border border-border min-w-0">
+                <span className="text-[10px] font-mono text-ink-faint block uppercase">NIST Control</span>
+                <span className="text-ink font-medium break-words text-xs mt-0.5 block">{finding.nistMapping || 'N/A'}</span>
               </div>
-              <div className="p-2 rounded bg-canvas border border-border min-w-0">
-                <span className="text-[10px] text-ink-faint block">ISO 27001</span>
-                <span className="text-ink font-medium break-words">{finding.iso27001 || 'N/A'}</span>
+              <div className="p-2.5 rounded-md bg-canvas border border-border min-w-0">
+                <span className="text-[10px] font-mono text-ink-faint block uppercase">ISO 27001</span>
+                <span className="text-ink font-medium break-words text-xs mt-0.5 block">{finding.iso27001 || 'N/A'}</span>
               </div>
             </div>
           </div>
